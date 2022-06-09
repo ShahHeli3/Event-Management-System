@@ -1,0 +1,2 @@
+# Event-Management-System
+This system is an environment where users can get their events planned. ● Users can either come up with their plan directly and hand it over to the event managers for execution, or can give their basic ideas and leave it upto the managers to get it done, or can connect to vendors as per their needs and get their work done. The system provides ideas to users for different events for their reference.
