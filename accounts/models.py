@@ -4,22 +4,25 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, username, f_name, l_name, contact_num, password=None, password2=None):
+    def create_user(self, **kwargs):  # (self, email, username, f_name, l_name, contact_num, profile_image, password=None, password2=None):
         """
-        Creates and saves a User with the given email, username, f_name, l_name, contact_num and password.
+        Creates and saves a User with the given email, username, f_name, l_name, contact_num, profile_image and password.
         """
-        if not email:
+        if not kwargs.get('email'):
             raise ValueError('User must have an email address')
 
-        user = self.model(
-            email=self.normalize_email(email),
-            username=username,
-            f_name=f_name,
-            l_name=l_name,
-            contact_num=contact_num,
-        )
+        # user = self.model(
+        #     email=self.normalize_email(email),
+        #     username=username,
+        #     f_name=f_name,
+        #     l_name=l_name,
+        #     contact_num=contact_num,
+        #     profile_image=profile_image
+        # )
+        kwargs.pop("password2", None)
+        user = self.model(**kwargs)
 
-        user.set_password(password)
+        user.set_password(kwargs.get('password'))
         user.save(using=self._db)
         return user
 
@@ -46,7 +49,7 @@ class User(AbstractBaseUser):
     f_name = models.CharField(verbose_name='First Name', max_length=200)
     l_name = models.CharField(verbose_name='Last Name', max_length=200)
     contact_num = PhoneNumberField()
-    profile_image = models.ImageField(default='default.jpg', upload_to='profile_pics/')
+    profile_image = models.ImageField(default='default.jpg', upload_to='profile_pics/', null=True, blank=True)
     is_event_manager = models.BooleanField(default=False)
 
     objects = UserManager()
