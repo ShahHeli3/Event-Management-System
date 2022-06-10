@@ -1,9 +1,26 @@
 from rest_framework import serializers
 from .models import User
+import re
+from django.core.exceptions import ValidationError
+
+
+def validate_password(password):
+    """
+    Function to validate password
+    :param password: takes in password and validates it
+    :return: validated password
+    """
+    reg = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{8,20}$"
+
+    if re.fullmatch(reg, password):
+        return password
+    else:
+        raise ValidationError("Invalid password. Password must contain atleast one uppercase alphabet, one lowercase "
+                              "alphabet, one digit, one special character and must be 8 to 20 characters in length.")
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+    password = serializers.CharField(style={'input_type': 'password'}, write_only=True, validators=[validate_password])
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
 
     class Meta:
