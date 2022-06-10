@@ -6,7 +6,7 @@ from .views import UserRegistrationView, UserLoginView, ChangePasswordView
 urlpatterns = [
     path('register/', UserRegistrationView.as_view(), name='register'),
     path('login/', UserLoginView.as_view(), name='login'),
-    path('changepassword/', ChangePasswordView.as_view(), name='changepassword'),
+    path('change_password/', ChangePasswordView.as_view(), name='change_password'),
     # path('profile/', UserProfileView.as_view(), name='profile'),
 ]
 
