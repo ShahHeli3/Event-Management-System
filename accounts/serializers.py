@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 
 import constants
@@ -51,6 +52,7 @@ class ChangePasswordSerializer(serializers.Serializer):
     """
     serializer to change user password
     """
+    current_password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
     password = serializers.CharField(style={'input_type': 'password'}, write_only=True, validators=[validate_password])
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
 
@@ -58,9 +60,13 @@ class ChangePasswordSerializer(serializers.Serializer):
         fields = ['password', 'password2']
 
     def validate(self, attrs):
+        current_password = attrs.get('current_password')
         password = attrs.get('password')
         password2 = attrs.get('password2')
         user = self.context.get('user')
+
+        if not check_password(current_password, user.password):
+            raise serializers.ValidationError("Current password is invalid")
 
         if password != password2:
             raise serializers.ValidationError("Password and Confirm Password doesn't match")
