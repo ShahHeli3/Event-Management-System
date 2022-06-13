@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import User
 import re
 from django.core.exceptions import ValidationError
+from django.contrib.auth.hashers import check_password
 
 
 def validate_password(password):
@@ -51,6 +52,7 @@ class UserLoginSerializer(serializers.ModelSerializer):
 
 
 class ChangePasswordSerializer(serializers.Serializer):
+    current_password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
     password = serializers.CharField(style={'input_type': 'password'}, write_only=True, validators=[validate_password])
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
 
@@ -58,9 +60,13 @@ class ChangePasswordSerializer(serializers.Serializer):
         fields = ['password', 'password2']
 
     def validate(self, attrs):
+        current_password = attrs.get('current_password')
         password = attrs.get('password')
         password2 = attrs.get('password2')
         user = self.context.get('user')
+
+        if not check_password(current_password, user.password):
+            raise serializers.ValidationError("Current password is invalid")
 
         if password != password2:
             raise serializers.ValidationError("Password and Confirm Password doesn't match")
