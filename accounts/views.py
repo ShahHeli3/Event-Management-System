@@ -11,6 +11,11 @@ from rest_framework.permissions import IsAuthenticated
 
 
 def get_tokens_for_user(user):
+    """
+    function to get refresh and access tokens for user authentication
+    :param user: takes in the verified user
+    :return: refresh token and access token
+    """
     refresh = RefreshToken.for_user(user)
 
     return {
@@ -20,6 +25,9 @@ def get_tokens_for_user(user):
 
 
 class UserRegistrationView(APIView):
+    """
+    to register a new user
+    """
 
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
@@ -32,6 +40,9 @@ class UserRegistrationView(APIView):
 
 
 class UserLoginView(APIView):
+    """
+    to login a user
+    """
 
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
@@ -51,6 +62,9 @@ class UserLoginView(APIView):
 
 
 class ChangePasswordView(APIView):
+    """
+    to change user password
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -63,6 +77,9 @@ class ChangePasswordView(APIView):
 
 
 class SendResetPasswordEmailView(APIView):
+    """
+    to send a mail when user requests to change password
+    """
 
     def post(self, request):
         serializer = SendPasswordResetEmailSerializer(data=request.data)
@@ -75,6 +92,9 @@ class SendResetPasswordEmailView(APIView):
 
 
 class ResetPasswordView(APIView):
+    """
+    to reset user password
+    """
 
     def post(self, request, user_id, token):
         serializer = ResetPasswordSerializer(data=request.data, context={'user_id': user_id, 'token': token})
@@ -86,6 +106,9 @@ class ResetPasswordView(APIView):
 
 
 class UserProfileView(APIView):
+    """
+    to view, update and delete user profile
+    """
     permission_classes = [IsAuthenticated]
 
     def get_object(self, id):

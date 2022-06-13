@@ -24,6 +24,9 @@ def validate_password(password):
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
+    """
+    serializer to register user
+    """
     password = serializers.CharField(style={'input_type': 'password'}, write_only=True, validators=[validate_password])
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
 
@@ -47,6 +50,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 
 class UserLoginSerializer(serializers.ModelSerializer):
+    """
+    serializer to login user
+    """
     email = serializers.EmailField(max_length=255)
 
     class Meta:
@@ -55,6 +61,9 @@ class UserLoginSerializer(serializers.ModelSerializer):
 
 
 class ChangePasswordSerializer(serializers.Serializer):
+    """
+    serializer to change user password
+    """
     password = serializers.CharField(style={'input_type': 'password'}, write_only=True, validators=[validate_password])
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
 
@@ -75,6 +84,9 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 
 class SendPasswordResetEmailSerializer(serializers.Serializer):
+    """
+    serializer to send a mail for password reset
+    """
     email = serializers.EmailField(max_length=255)
 
     class Meta:
@@ -107,6 +119,9 @@ class SendPasswordResetEmailSerializer(serializers.Serializer):
 
 
 class ResetPasswordSerializer(serializers.Serializer):
+    """
+    serializer to reset password
+    """
 
     password = serializers.CharField(style={'input_type': 'password'}, write_only=True, validators=[validate_password])
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
@@ -140,6 +155,9 @@ class ResetPasswordSerializer(serializers.Serializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    """
+    serializer for user profile operations
+    """
 
     class Meta:
         model = User
