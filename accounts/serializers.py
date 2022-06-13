@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+import constants
 from .models import User
 from django.core.exceptions import ValidationError
 from django.utils.encoding import smart_str, force_bytes, DjangoUnicodeDecodeError
@@ -86,7 +88,7 @@ class SendPasswordResetEmailSerializer(serializers.Serializer):
             # print("encoded uid--->", user_id)
             token = PasswordResetTokenGenerator().make_token(user)
             # print("token--->", token)
-            link = 'http://localhost:3000/api/user/reset/'+user_id+'/'+token
+            link = constants.password_reset_link+user_id+'/'+token
             # print("link--->", link)
 
             # send mail
