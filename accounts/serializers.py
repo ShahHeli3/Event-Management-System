@@ -138,8 +138,9 @@ class ResetPasswordSerializer(serializers.Serializer):
             PasswordResetTokenGenerator().check_token((user, token))
             raise ValidationError("Token is invalid or expired")
 
-# class UserProfileSerializer(serializers.ModelSerializer):
-#
-#     class Meta:
-#         model = User
-#         fields = ['id', 'email', 'name']
+
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['email', 'username', 'f_name', 'l_name', 'contact_num', 'profile_image']
