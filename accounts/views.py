@@ -1,13 +1,14 @@
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
-from rest_framework import status, viewsets, mixins
+from rest_framework import status
 from rest_framework.views import APIView
 
 from constants import successful_registration, successful_login, login_error, change_password, \
-    password_reset_email_sent, password_reset_successful
+    password_reset_email_sent, password_reset_successful, successful_logout
 from .models import User
 from .serializers import UserRegistrationSerializer, UserLoginSerializer, ChangePasswordSerializer, \
     SendPasswordResetEmailSerializer, ResetPasswordSerializer, UserProfileSerializer
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, logout
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 
@@ -137,3 +138,14 @@ class UserProfileView(APIView):
         user = self.get_object(id)
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserLogOutView(APIView):
+    """
+    for user logout
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        logout(request)
+        return Response({'msg': successful_logout}, status=status.HTTP_200_OK)
