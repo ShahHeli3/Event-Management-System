@@ -17,13 +17,13 @@ class Testimonials(models.Model):
         return self.review
 
 
-# class QnAForum(models.Model):
-#     """
-#     model for questions and answers
-#     """
-#     user = models.ForeignKey(User, on_delete=SET(AnonymousUser.id), related_name='user', null=True)
-#     question = models.TextField()
-#     answer = models.TextField(required=False)
+class QuestionAnswerForum(models.Model):
+    """
+    model for questions and answers
+    """
+    user = models.ForeignKey(User, on_delete=SET(AnonymousUser.id))
+    question = models.TextField()
+    answer = models.TextField(null=True)
 
 
 
