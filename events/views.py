@@ -8,6 +8,9 @@ from .serializers import ViewTestimonialSerializer, AddTestimonialSerializer
 
 
 class ViewTestimonials(generics.GenericAPIView, mixins.ListModelMixin):
+    """
+    class for viewing all the testimonials
+    """
     serializer_class = ViewTestimonialSerializer
     queryset = Testimonials.objects.all().order_by('-post_date_time')
 
@@ -16,6 +19,9 @@ class ViewTestimonials(generics.GenericAPIView, mixins.ListModelMixin):
 
 
 class AddTestimonials(generics.GenericAPIView, mixins.CreateModelMixin):
+    """
+    class for adding a testimonial
+    """
     serializer_class = AddTestimonialSerializer
     queryset = Testimonials.objects.all()
     permission_classes = [IsAuthenticated]

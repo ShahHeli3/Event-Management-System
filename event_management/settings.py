@@ -14,7 +14,6 @@ from pathlib import Path
 from datetime import timedelta
 import os
 from dotenv import load_dotenv
-import django_heroku
 
 load_dotenv()
 
@@ -29,9 +28,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-pc=a_s4b#w5sfmgl%!!=%9ziba!8wk0--qb0v06as)pwynz&za'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG')
 
-ALLOWED_HOSTS = ['127.0.0.1:8000', 'heli-event-management.herokuapp.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'heli-event-management.herokuapp.com']
 
 
 # Application definition
@@ -177,9 +176,8 @@ SIMPLE_JWT = {
     'JTI_CLAIM': 'jti',
 }
 
-
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
-django_heroku.settings(locals())
+

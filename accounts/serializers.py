@@ -1,8 +1,8 @@
 from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 
-from constants import passwords_does_not_match, current_password_check, password_reset_link, reset_email_body, \
-    reset_email_user_error, token_error
+from constants import PASSWORD_DOES_NOT_MATCH, CURRENT_PASSWORD_CHECK, PASSWORD_RESET_LINK, RESET_EMAIL_BODY, \
+    RESET_EMAIL_USER_ERROR, TOKEN_ERROR
 from .models import User
 from django.core.exceptions import ValidationError
 from django.utils.encoding import smart_str, force_bytes, DjangoUnicodeDecodeError
@@ -31,7 +31,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         password2 = attrs.get('password2')
 
         if password != password2:
-            raise serializers.ValidationError(passwords_does_not_match)
+            raise serializers.ValidationError(PASSWORD_DOES_NOT_MATCH)
         return attrs
 
     def create(self, validated_data):
@@ -67,10 +67,10 @@ class ChangePasswordSerializer(serializers.Serializer):
         user = self.context.get('user')
 
         if not check_password(current_password, user.password):
-            raise serializers.ValidationError(current_password_check)
+            raise serializers.ValidationError(CURRENT_PASSWORD_CHECK)
 
         if password != password2:
-            raise serializers.ValidationError(passwords_does_not_match)
+            raise serializers.ValidationError(PASSWORD_DOES_NOT_MATCH)
 
         user.set_password(password)
         user.save()
@@ -95,11 +95,11 @@ class SendPasswordResetEmailSerializer(serializers.Serializer):
             # print("encoded uid--->", user_id)
             token = PasswordResetTokenGenerator().make_token(user)
             # print("token--->", token)
-            link = password_reset_link+user_id+'/'+token
+            link = PASSWORD_RESET_LINK+user_id+'/'+token
             # print("link--->", link)
 
             # send mail
-            body = reset_email_body +link
+            body = RESET_EMAIL_BODY +link
             data = {
                 'subject': 'Reset Your Password',
                 'body': body,
@@ -109,7 +109,7 @@ class SendPasswordResetEmailSerializer(serializers.Serializer):
 
             return attrs
         else:
-            raise ValidationError(reset_email_user_error)
+            raise ValidationError(RESET_EMAIL_USER_ERROR)
 
 
 class ResetPasswordSerializer(serializers.Serializer):
@@ -131,13 +131,13 @@ class ResetPasswordSerializer(serializers.Serializer):
             token = self.context.get('token')
 
             if password != password2:
-                raise serializers.ValidationError(passwords_does_not_match)
+                raise serializers.ValidationError(PASSWORD_DOES_NOT_MATCH)
 
             id = smart_str(urlsafe_base64_decode(user_id))
             user = User.objects.get(id=id)
 
             if not PasswordResetTokenGenerator().check_token(user, token):
-                raise ValidationError(token_error)
+                raise ValidationError(TOKEN_ERROR)
 
             user.set_password(password)
             user.save()
@@ -145,7 +145,7 @@ class ResetPasswordSerializer(serializers.Serializer):
 
         except DjangoUnicodeDecodeError:
             PasswordResetTokenGenerator().check_token((user, token))
-            raise ValidationError(token_error)
+            raise ValidationError(TOKEN_ERROR)
 
 
 class UserProfileSerializer(serializers.ModelSerializer):

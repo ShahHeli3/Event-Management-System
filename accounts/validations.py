@@ -1,7 +1,7 @@
 import re
 from django.core.exceptions import ValidationError
 
-from constants import short_username, long_username, lowercase_username, blank_username, invalid_name, invalid_password
+from constants import SHORT_USERNAME, LONG_USERNAME, LOWERCASE_USERNAME, BLANK_USERNAME, INVALID_NAME, INVALID_PASSWORD
 
 
 def validate_username(username):
@@ -11,13 +11,13 @@ def validate_username(username):
     :return: validated username
     """
     if len(username) < 3:
-        raise ValidationError(short_username)
+        raise ValidationError(SHORT_USERNAME)
     elif len(username) > 30:
-        raise ValidationError(long_username)
+        raise ValidationError(LONG_USERNAME)
     elif not username.islower():
-        raise ValidationError(lowercase_username)
+        raise ValidationError(LOWERCASE_USERNAME)
     elif " " in username:
-        raise ValidationError(blank_username)
+        raise ValidationError(BLANK_USERNAME)
     else:
         return username
 
@@ -29,11 +29,11 @@ def validate_name(name):
     :return: validated name
     """
     if " " in name:
-        raise ValidationError(invalid_name)
+        raise ValidationError(INVALID_NAME)
     elif name.isalpha():
         return name
     else:
-        raise ValidationError(invalid_name)
+        raise ValidationError(INVALID_NAME)
 
 
 def validate_password(password):
@@ -47,4 +47,4 @@ def validate_password(password):
     if re.fullmatch(reg, password):
         return password
     else:
-        raise ValidationError(invalid_password)
+        raise ValidationError(INVALID_PASSWORD)
