@@ -9,18 +9,10 @@ from .serializers import ViewTestimonialSerializer, AddTestimonialSerializer
 
 class ViewTestimonials(generics.GenericAPIView, mixins.ListModelMixin):
     serializer_class = ViewTestimonialSerializer
-    queryset = Testimonials.objects.all()
+    queryset = Testimonials.objects.all().order_by('-post_date_time')
 
     def get(self, request):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return self.list(request)
 
 
 class AddTestimonials(generics.GenericAPIView, mixins.CreateModelMixin):
