@@ -1,6 +1,8 @@
 import re
 from django.core.exceptions import ValidationError
 
+from constants import short_username, long_username, lowercase_username, blank_username, invalid_name, invalid_password
+
 
 def validate_username(username):
     """
@@ -9,15 +11,15 @@ def validate_username(username):
     :return: validated username
     """
     if len(username) < 3:
-        raise ValidationError("Username too short.Please enter a username of atleast 3 characters.")
+        raise ValidationError(short_username)
     elif len(username) > 30:
-        raise ValidationError("Username too long.Please enter a username of not greater than 30 characters.")
+        raise ValidationError(long_username)
     elif not username.islower():
-        raise ValidationError("Username should consists of lower case alphabets only.")
+        raise ValidationError(lowercase_username)
     elif " " in username:
-        raise ValidationError("Username cannot contain spaces.")
+        raise ValidationError(blank_username)
     else:
-        return True
+        return username
 
 
 def validate_name(name):
@@ -27,11 +29,11 @@ def validate_name(name):
     :return: validated name
     """
     if " " in name:
-        raise ValidationError(f"{name} cannot contain spaces.")
+        raise ValidationError(invalid_name)
     elif name.isalpha():
         return name
     else:
-        raise ValidationError(f"{name} is invalid. Enter a valid name")
+        raise ValidationError(invalid_name)
 
 
 def validate_password(password):
@@ -45,5 +47,4 @@ def validate_password(password):
     if re.fullmatch(reg, password):
         return password
     else:
-        raise ValidationError("Invalid password. Password must contain atleast one uppercase alphabet, one lowercase "
-                              "alphabet, one digit, one special character and must be 8 to 20 characters in length.")
+        raise ValidationError(invalid_password)

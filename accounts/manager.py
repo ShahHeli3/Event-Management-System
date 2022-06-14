@@ -1,5 +1,7 @@
 from django.contrib.auth.models import BaseUserManager
 
+from constants import user_manager
+
 
 class UserManager(BaseUserManager):
     def create_user(self, **kwargs):
@@ -7,7 +9,7 @@ class UserManager(BaseUserManager):
         Creates and saves a User with the given email, username, first_name, last_name, contact_number, profile_image and password
         """
         if not kwargs.get('email'):
-            raise ValueError('User must have an email address')
+            raise ValueError(user_manager)
 
         kwargs.pop("password2", None)
         user = self.model(**kwargs)

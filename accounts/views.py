@@ -2,6 +2,8 @@ from rest_framework.response import Response
 from rest_framework import status, viewsets, mixins
 from rest_framework.views import APIView
 
+from constants import successful_registration, successful_login, login_error, change_password, \
+    password_reset_email_sent, password_reset_successful
 from .models import User
 from .serializers import UserRegistrationSerializer, UserLoginSerializer, ChangePasswordSerializer, \
     SendPasswordResetEmailSerializer, ResetPasswordSerializer, UserProfileSerializer
@@ -35,7 +37,7 @@ class UserRegistrationView(APIView):
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
             token = get_tokens_for_user(user)
-            return Response({'token': token, 'msg': 'Registration successful'}, status=status.HTTP_201_CREATED)
+            return Response({'token': token, 'msg': successful_registration}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -54,9 +56,9 @@ class UserLoginView(APIView):
 
             if user:
                 token = get_tokens_for_user(user)
-                return Response({'token': token, 'msg': 'Login Successful'}, status=status.HTTP_200_OK)
+                return Response({'token': token, 'msg': successful_login}, status=status.HTTP_200_OK)
             else:
-                return Response({'errors': {'non_field_errors': ['Email or password is not valid']}}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'errors': {'non_field_errors': [login_error]}}, status=status.HTTP_404_NOT_FOUND)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -71,7 +73,7 @@ class ChangePasswordView(APIView):
         serializer = ChangePasswordSerializer(data=request.data, context={'user': request.user})
 
         if serializer.is_valid(raise_exception=True):
-            return Response({'msg': 'Password Changed Successfully'}, status=status.HTTP_200_OK)
+            return Response({'msg': change_password}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -85,8 +87,7 @@ class SendResetPasswordEmailView(APIView):
         serializer = SendPasswordResetEmailSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
-            return Response({'msg': 'A link to reset your password has been sent to your email ID. '
-                                    'Please check your email'}, status=status.HTTP_200_OK)
+            return Response({'msg': password_reset_email_sent}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -100,7 +101,7 @@ class ResetPasswordView(APIView):
         serializer = ResetPasswordSerializer(data=request.data, context={'user_id': user_id, 'token': token})
 
         if serializer.is_valid(raise_exception=True):
-            return Response({'msg': 'Password Reset Successful'}, status=status.HTTP_200_OK)
+            return Response({'msg': password_reset_successful}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

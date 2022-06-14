@@ -1,7 +1,8 @@
 from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 
-import constants
+from constants import passwords_does_not_match, current_password_check, password_reset_link, reset_email_body, \
+    reset_email_user_error, token_error
 from .models import User
 from django.core.exceptions import ValidationError
 from django.utils.encoding import smart_str, force_bytes, DjangoUnicodeDecodeError
@@ -30,7 +31,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         password2 = attrs.get('password2')
 
         if password != password2:
-            raise serializers.ValidationError("Password and Confirm Password doesn't match")
+            raise serializers.ValidationError(passwords_does_not_match)
         return attrs
 
     def create(self, validated_data):
@@ -66,10 +67,10 @@ class ChangePasswordSerializer(serializers.Serializer):
         user = self.context.get('user')
 
         if not check_password(current_password, user.password):
-            raise serializers.ValidationError("Current password is invalid")
+            raise serializers.ValidationError(current_password_check)
 
         if password != password2:
-            raise serializers.ValidationError("Password and Confirm Password doesn't match")
+            raise serializers.ValidationError(passwords_does_not_match)
 
         user.set_password(password)
         user.save()
@@ -94,11 +95,11 @@ class SendPasswordResetEmailSerializer(serializers.Serializer):
             # print("encoded uid--->", user_id)
             token = PasswordResetTokenGenerator().make_token(user)
             # print("token--->", token)
-            link = constants.password_reset_link+user_id+'/'+token
+            link = password_reset_link+user_id+'/'+token
             # print("link--->", link)
 
             # send mail
-            body = 'Click the following link to Reset your Password '+link
+            body = reset_email_body +link
             data = {
                 'subject': 'Reset Your Password',
                 'body': body,
@@ -108,7 +109,7 @@ class SendPasswordResetEmailSerializer(serializers.Serializer):
 
             return attrs
         else:
-            raise ValidationError('You are not a registered user. Please enter a registered Email ID')
+            raise ValidationError(reset_email_user_error)
 
 
 class ResetPasswordSerializer(serializers.Serializer):
@@ -130,13 +131,13 @@ class ResetPasswordSerializer(serializers.Serializer):
             token = self.context.get('token')
 
             if password != password2:
-                raise serializers.ValidationError("Password and Confirm Password doesn't match")
+                raise serializers.ValidationError(passwords_does_not_match)
 
             id = smart_str(urlsafe_base64_decode(user_id))
             user = User.objects.get(id=id)
 
             if not PasswordResetTokenGenerator().check_token(user, token):
-                raise ValidationError("Token is invalid or expired")
+                raise ValidationError(token_error)
 
             user.set_password(password)
             user.save()
@@ -144,7 +145,7 @@ class ResetPasswordSerializer(serializers.Serializer):
 
         except DjangoUnicodeDecodeError:
             PasswordResetTokenGenerator().check_token((user, token))
-            raise ValidationError("Token is invalid or expired")
+            raise ValidationError(token_error)
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
