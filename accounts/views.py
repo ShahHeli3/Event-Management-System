@@ -3,11 +3,11 @@ from rest_framework import status
 from rest_framework.views import APIView
 
 from constants import SUCCESSFUL_REGISTRATION, SUCCESSFUL_LOGIN, LOGIN_ERROR, CHANGE_PASSWORD, \
-    PASSWORD_RESET_EMAIL_SENT, PASSWORD_RESET_SUCCESSFUL, SUCCESSFUL_LOGOUT, DELETE_PROFILE
+    PASSWORD_RESET_EMAIL_SENT, PASSWORD_RESET_SUCCESSFUL, DELETE_PROFILE
 from .models import User
 from .serializers import UserRegistrationSerializer, UserLoginSerializer, ChangePasswordSerializer, \
     SendPasswordResetEmailSerializer, ResetPasswordSerializer, UserProfileSerializer
-from django.contrib.auth import authenticate, logout
+from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 
@@ -137,14 +137,3 @@ class UserProfileView(APIView):
         user = self.get_object(request)
         user.delete()
         return Response({'msg': DELETE_PROFILE}, status=status.HTTP_204_NO_CONTENT)
-
-
-class UserLogOutView(APIView):
-    """
-    for user logout
-    """
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        logout(request)
-        return Response({'msg': SUCCESSFUL_LOGOUT}, status=status.HTTP_200_OK)
