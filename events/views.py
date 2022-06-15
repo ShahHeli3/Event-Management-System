@@ -63,6 +63,7 @@ class QuestionAnswersView(generics.GenericAPIView, mixins.ListModelMixin):
 
     serializer_class = QuestionAnswersSerializer
     queryset = QuestionAnswerForum.objects.all()
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         return self.list(request)
