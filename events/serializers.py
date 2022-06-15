@@ -92,3 +92,21 @@ class AddAnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuestionAnswerForum
         fields = '__all__'
+
+    def validate(self, attrs):
+        """
+        sends an email to user whose question has been updated
+        """
+        user = attrs.get('user')
+        answer = attrs.get('answer')
+        question = attrs.get('question')
+
+        # send mail to the user
+        body = "Question : " + question + "\nAnswer : " + answer
+        data = {
+            'subject': "Your question has been answered",
+            'body': body,
+            'to_email': [user.email]
+        }
+        Util.send_mail(data)
+        return attrs
