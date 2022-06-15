@@ -1,11 +1,12 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from .views import ViewTestimonials, TestimonialsViewSet, QuestionAnswersView, AddQuestionView, AddAnswerView
-
+from .views import ViewTestimonials, TestimonialsViewSet, QuestionAnswersView, AddQuestionView, AddAnswerView, \
+    EventCategoriesViewSet
 
 router = DefaultRouter()
 router.register('testimonial', TestimonialsViewSet, basename='testimonial')
+router.register('event_categories', EventCategoriesViewSet, basename='event_categories')
 
 urlpatterns = [
     path('view_testimonials/', ViewTestimonials.as_view(), name='view_testimonials'),

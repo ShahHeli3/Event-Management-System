@@ -26,4 +26,8 @@ class QuestionAnswerForum(models.Model):
     answer = models.TextField(null=True)
 
 
-
+class EventCategories(models.Model):
+    """
+    model for event categories
+    """
+    event_category = models.CharField(max_length=200)

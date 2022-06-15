@@ -4,9 +4,9 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
 from constants import ACCESS_DENIED, DELETE_TESTIMONIAL
-from .models import Testimonials, QuestionAnswerForum
+from .models import Testimonials, QuestionAnswerForum, EventCategories
 from .serializers import ViewTestimonialSerializer, AddTestimonialSerializer, QuestionAnswersSerializer, \
-    AddQuestionSerializer, AddAnswerSerializer
+    AddQuestionSerializer, AddAnswerSerializer, EventCategoriesSerializer
 
 
 class ViewTestimonials(generics.GenericAPIView, mixins.ListModelMixin):
@@ -106,5 +106,14 @@ class AddAnswerView(generics.GenericAPIView, mixins.UpdateModelMixin, mixins.Des
 
     def delete(self, request, id):
         return self.destroy(request, id)
+
+
+class EventCategoriesViewSet(viewsets.ModelViewSet):
+    """
+    for creating, updating and deleting event categories
+    """
+    serializer_class = EventCategoriesSerializer
+    queryset = EventCategories.objects.all().order_by('id')
+    permission_classes = [IsAdminUser]
 
 

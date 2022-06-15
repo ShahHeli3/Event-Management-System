@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from accounts.models import User
-from .models import Testimonials, QuestionAnswerForum
+from .models import Testimonials, QuestionAnswerForum, EventCategories
 from .utils import Util
 
 
@@ -110,3 +110,12 @@ class AddAnswerSerializer(serializers.ModelSerializer):
         }
         Util.send_mail(data)
         return attrs
+
+
+class EventCategoriesSerializer(serializers.ModelSerializer):
+    """
+    serializer for event categories
+    """
+    class Meta:
+        model = EventCategories
+        fields = ['id', 'event_category']
