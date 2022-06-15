@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from constants import ACCESS_DENIED, DELETE_TESTIMONIAL
 from .models import Testimonials, QuestionAnswerForum, EventCategories, Events
 from .serializers import ViewTestimonialSerializer, AddTestimonialSerializer, QuestionAnswersSerializer, \
-    AddQuestionSerializer, AddAnswerSerializer, EventCategoriesSerializer, EventsSerializer, GetEventsSerializer
+    AddQuestionSerializer, AddAnswerSerializer, EventCategoriesSerializer, EventsSerializer, GetEventsSerializer, \
+    GetEventCategoriesSerializer
 
 
 class ViewTestimonials(generics.GenericAPIView, mixins.ListModelMixin):
@@ -107,6 +108,18 @@ class AddAnswerView(generics.GenericAPIView, mixins.UpdateModelMixin, mixins.Des
 
     def delete(self, request, id):
         return self.destroy(request, id)
+
+
+class GetEventCategoriesView(generics.GenericAPIView, mixins.ListModelMixin):
+    """
+    for viewing event categories
+    """
+    serializer_class = GetEventCategoriesSerializer
+    queryset = EventCategories.objects.all().order_by('id')
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return self.list(request)
 
 
 class EventCategoriesViewSet(viewsets.ModelViewSet):

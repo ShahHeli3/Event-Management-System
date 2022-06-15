@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from .views import ViewTestimonials, TestimonialsViewSet, QuestionAnswersView, AddQuestionView, AddAnswerView, \
-    EventCategoriesViewSet, GetEventsView, EventsViewSet
+    GetEventCategoriesView, EventCategoriesViewSet, GetEventsView, EventsViewSet
 
 router = DefaultRouter()
 router.register('testimonial', TestimonialsViewSet, basename='testimonial')
@@ -14,6 +14,7 @@ urlpatterns = [
     path('question_answer/', QuestionAnswersView.as_view(), name='question_answer'),
     path('add_question/', AddQuestionView.as_view(), name='add_question'),
     path('add_answer/<int:id>/', AddAnswerView.as_view(), name='add_answer'),
+    path('view_event_categories/', GetEventCategoriesView.as_view(), name='view_event_categories'),
     path('view_events/', GetEventsView.as_view(), name='view_events'),
 ] + router.urls
 

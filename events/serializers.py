@@ -112,9 +112,18 @@ class AddAnswerSerializer(serializers.ModelSerializer):
         return attrs
 
 
+class GetEventCategoriesSerializer(serializers.ModelSerializer):
+    """
+    serializer to view event categories
+    """
+    class Meta:
+        model = EventCategories
+        fields = ['event_category']
+
+
 class EventCategoriesSerializer(serializers.ModelSerializer):
     """
-    serializer for event categories
+    serializer to add, update and delete event categories
     """
     class Meta:
         model = EventCategories
