@@ -136,7 +136,7 @@ class GetEventsSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Events
-        fields = '__all__'
+        fields = ['event_category', 'event_name', 'event_details']
 
     event_category = serializers.SerializerMethodField()
 

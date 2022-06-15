@@ -140,7 +140,7 @@ class GetEventsView(generics.GenericAPIView, mixins.ListModelMixin):
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['event_category']
-    search_fields = ['event_category', 'event_name', 'event_details']
+    search_fields = ['event_name', 'event_details']
 
     def get(self, request):
         return self.list(request)
