@@ -62,7 +62,7 @@ class QuestionAnswersView(generics.GenericAPIView, mixins.ListModelMixin):
     """
 
     serializer_class = QuestionAnswersSerializer
-    queryset = QuestionAnswerForum.objects.all()
+    queryset = QuestionAnswerForum.objects.all().order_by('-post_date_time')
 
     def get(self, request):
         return self.list(request)
@@ -74,7 +74,6 @@ class AddQuestionView(generics.GenericAPIView, mixins.CreateModelMixin):
     """
 
     serializer_class = AddQuestionSerializer
-    queryset = QuestionAnswerForum.objects.all()
     permission_classes = [IsAuthenticated]
 
     def post(self, request):

@@ -24,6 +24,8 @@ class QuestionAnswerForum(models.Model):
     user = models.ForeignKey(User, on_delete=SET(AnonymousUser.id))
     question = models.TextField()
     answer = models.TextField(null=True)
+    post_date_time = models.DateTimeField(auto_now_add=True)
+
 
 
 
