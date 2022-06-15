@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from accounts.models import User
-from .models import Testimonials, QuestionAnswerForum, EventCategories
+from .models import Testimonials, QuestionAnswerForum, EventCategories, Events
 from .utils import Util
 
 
@@ -76,7 +76,7 @@ class AddQuestionSerializer(serializers.ModelSerializer):
 
         user = attrs.get('user')
 
-        # send mail to all the event managers
+        # send mail to all the event managers that a new question has been posted
         body = "Question : " + attrs.get('question') + "\nPosted by : " + user.username
         data = {
             'subject': 'New Question Posted',
@@ -101,7 +101,7 @@ class AddAnswerSerializer(serializers.ModelSerializer):
         answer = attrs.get('answer')
         question = attrs.get('question')
 
-        # send mail to the user
+        # send mail to the user that his/her question has been answered
         body = "Question : " + question + "\nAnswer : " + answer
         data = {
             'subject': "Your question has been answered",
@@ -119,3 +119,31 @@ class EventCategoriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventCategories
         fields = ['id', 'event_category']
+
+
+class GetEventsSerializer(serializers.ModelSerializer):
+    """
+    serializer to view events
+    """
+    class Meta:
+        model = Events
+        fields = '__all__'
+
+    event_category = serializers.SerializerMethodField()
+
+    def get_event_category(self, obj):
+        return obj.event_category.event_category
+
+
+class EventsSerializer(serializers.ModelSerializer):
+    """
+    serializer to add, update and delete events
+    """
+    class Meta:
+        model = Events
+        fields = '__all__'
+
+
+
+
+

@@ -31,3 +31,18 @@ class EventCategories(models.Model):
     model for event categories
     """
     event_category = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.event_category
+
+
+class Events(models.Model):
+    """
+    model for events
+    """
+    event_name = models.TextField()
+    event_details = models.TextField()
+    event_category = models.ForeignKey(EventCategories, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.event_name

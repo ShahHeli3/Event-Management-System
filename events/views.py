@@ -1,12 +1,13 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status, viewsets
-from rest_framework import mixins
+from rest_framework import mixins, filters
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
 from constants import ACCESS_DENIED, DELETE_TESTIMONIAL
-from .models import Testimonials, QuestionAnswerForum, EventCategories
+from .models import Testimonials, QuestionAnswerForum, EventCategories, Events
 from .serializers import ViewTestimonialSerializer, AddTestimonialSerializer, QuestionAnswersSerializer, \
-    AddQuestionSerializer, AddAnswerSerializer, EventCategoriesSerializer
+    AddQuestionSerializer, AddAnswerSerializer, EventCategoriesSerializer, EventsSerializer, GetEventsSerializer
 
 
 class ViewTestimonials(generics.GenericAPIView, mixins.ListModelMixin):
@@ -117,3 +118,25 @@ class EventCategoriesViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUser]
 
 
+class GetEventsView(generics.GenericAPIView, mixins.ListModelMixin):
+    """
+    for viewing events
+    """
+    serializer_class = GetEventsSerializer
+    queryset = Events.objects.all().order_by('id')
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['event_category']
+    search_fields = ['event_category', 'event_name', 'event_details']
+
+    def get(self, request):
+        return self.list(request)
+
+
+class EventsViewSet(viewsets.ModelViewSet):
+    """
+    for creating, updating and deleting events
+    """
+    serializer_class = EventsSerializer
+    queryset = Events.objects.all().order_by('id')
+    permission_classes = [IsAdminUser]
