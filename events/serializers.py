@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from accounts.models import User
-from .models import Testimonials, QuestionAnswerForum, EventCategories, Events
+from .models import Testimonials, QuestionAnswerForum, EventCategories, Events, EventIdeas, EventImages
 from .utils import Util
 
 
@@ -88,7 +88,6 @@ class AddQuestionSerializer(serializers.ModelSerializer):
 
 
 class AddAnswerSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = QuestionAnswerForum
         fields = '__all__'
@@ -116,6 +115,7 @@ class GetEventCategoriesSerializer(serializers.ModelSerializer):
     """
     serializer to view event categories
     """
+
     class Meta:
         model = EventCategories
         fields = ['event_category']
@@ -125,6 +125,7 @@ class EventCategoriesSerializer(serializers.ModelSerializer):
     """
     serializer to add, update and delete event categories
     """
+
     class Meta:
         model = EventCategories
         fields = ['id', 'event_category']
@@ -134,6 +135,7 @@ class GetEventsSerializer(serializers.ModelSerializer):
     """
     serializer to view events
     """
+
     class Meta:
         model = Events
         fields = ['event_category', 'event_name', 'event_details']
@@ -148,11 +150,43 @@ class EventsSerializer(serializers.ModelSerializer):
     """
     serializer to add, update and delete events
     """
+
     class Meta:
         model = Events
         fields = '__all__'
 
 
+class EventImagesSerializer(serializers.ModelSerializer):
+    """
+    serializer to view event's images
+    """
+
+    class Meta:
+        model = EventImages
+        fields = ['event_idea_id', 'event_image', 'event_image_title', 'event_image_details']
 
 
+class GetEventIdeasSerializer(serializers.ModelSerializer):
+    """
+    serializer to view event ideas
+    """
+    # images = serializers.SerializerMethodField(read_only=True)
+    #
+    # def get_images(self, obj):
+    #     images = EventImages.objects.filter(event_idea_id=obj)
+    #     return GetEventImagesSerializer(images, many=True).data
 
+    image_set = EventImagesSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = EventIdeas
+        fields = ['event_idea', 'event_city', 'image_set']
+
+
+class EventIdeasSerializer(serializers.ModelSerializer):
+    """
+    serializer to insert, update and delete event ideas
+    """
+    class Meta:
+        model = EventIdeas
+        fields = ['event_id', 'event_idea', 'event_city']

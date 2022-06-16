@@ -5,10 +5,10 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
 from constants import ACCESS_DENIED, DELETE_TESTIMONIAL
-from .models import Testimonials, QuestionAnswerForum, EventCategories, Events
+from .models import Testimonials, QuestionAnswerForum, EventCategories, Events, EventIdeas, EventImages
 from .serializers import ViewTestimonialSerializer, AddTestimonialSerializer, QuestionAnswersSerializer, \
     AddQuestionSerializer, AddAnswerSerializer, EventCategoriesSerializer, EventsSerializer, GetEventsSerializer, \
-    GetEventCategoriesSerializer
+    GetEventCategoriesSerializer, GetEventIdeasSerializer, EventImagesSerializer, EventIdeasSerializer
 
 
 class ViewTestimonials(generics.GenericAPIView, mixins.ListModelMixin):
@@ -153,3 +153,37 @@ class EventsViewSet(viewsets.ModelViewSet):
     serializer_class = EventsSerializer
     queryset = Events.objects.all().order_by('id')
     permission_classes = [IsAdminUser]
+
+
+class GetEventIdeasView(generics.GenericAPIView, mixins.ListModelMixin):
+    """
+    class to view event ideas and its images
+    """
+    lookup_field = 'event_id'
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['event_city', 'event_idea']
+
+    def get(self, request, event_id,  *args, **kwargs):
+        event_idea_queryset = EventIdeas.objects.filter(event_id=event_id)
+        event_idea_serializer = GetEventIdeasSerializer(event_idea_queryset, many=True)
+        return Response({'data': event_idea_serializer.data})
+
+
+class EventIdeasViewSet(viewsets.ModelViewSet):
+    """
+    class to add,update and delete ideas
+    """
+    serializer_class = EventIdeasSerializer
+    queryset = EventIdeas.objects.all().order_by('-create_date')
+    permission_classes = [IsAdminUser]
+
+
+class EventImagesViewSet(viewsets.ModelViewSet):
+    """
+    class to add,update and delete event images
+    """
+    serializer_class = EventImagesSerializer
+    queryset = EventImages.objects.all().order_by('id')
+    permission_classes = [IsAdminUser]
+
+
