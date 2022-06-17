@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from accounts.models import User
-from .models import Testimonials, QuestionAnswerForum, EventCategories, Events, EventIdeas, EventImages
+from .models import Testimonials, QuestionAnswerForum, EventCategories, Events, EventIdeas, EventImages, EventReviews
 from .utils import Util
 
 
@@ -166,6 +166,21 @@ class EventImagesSerializer(serializers.ModelSerializer):
         fields = ['event_idea_id', 'event_image', 'event_image_title', 'event_image_details']
 
 
+class EventReviewSerializer(serializers.ModelSerializer):
+    """
+    serializer for event reviews
+    """
+    class Meta:
+        model = EventReviews
+        fields = ['user', 'event_idea_id', 'event_review']
+
+    # user = serializers.SerializerMethodField()
+    #
+    # def get_user(self, obj):
+    #     print(obj.user.username)
+    #     # return obj.user.username
+
+
 class GetEventIdeasSerializer(serializers.ModelSerializer):
     """
     serializer to view event ideas
@@ -177,10 +192,11 @@ class GetEventIdeasSerializer(serializers.ModelSerializer):
     #     return GetEventImagesSerializer(images, many=True).data
 
     image_set = EventImagesSerializer(many=True, read_only=True)
+    review_set = EventReviewSerializer(many=True, read_only=True)
 
     class Meta:
         model = EventIdeas
-        fields = ['event_idea', 'event_city', 'image_set']
+        fields = ['event_idea', 'event_city', 'image_set', 'review_set']
 
 
 class EventIdeasSerializer(serializers.ModelSerializer):
@@ -190,3 +206,6 @@ class EventIdeasSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventIdeas
         fields = ['event_id', 'event_idea', 'event_city']
+
+
+

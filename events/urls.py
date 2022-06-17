@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from .views import ViewTestimonials, TestimonialsViewSet, QuestionAnswersView, AddQuestionView, AddAnswerView, \
     GetEventCategoriesView, EventCategoriesViewSet, GetEventsView, EventsViewSet, GetEventIdeasView, EventIdeasViewSet, \
-    EventImagesViewSet
+    EventImagesViewSet, EventReviewViewSet
 
 router = DefaultRouter()
 router.register('testimonial', TestimonialsViewSet, basename='testimonial')
@@ -11,6 +11,8 @@ router.register('event_categories', EventCategoriesViewSet, basename='event_cate
 router.register('events', EventsViewSet, basename='events')
 router.register('event_ideas', EventIdeasViewSet, basename='event_ideas')
 router.register('event_images', EventImagesViewSet, basename='event_images')
+router.register('event_reviews', EventReviewViewSet, basename='event_reviews')
+
 
 urlpatterns = [
     path('view_testimonials/', ViewTestimonials.as_view(), name='view_testimonials'),

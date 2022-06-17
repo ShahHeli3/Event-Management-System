@@ -1,14 +1,16 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status, viewsets
-from rest_framework import mixins, filters
+from rest_framework import mixins
+from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
-from constants import ACCESS_DENIED, DELETE_TESTIMONIAL
-from .models import Testimonials, QuestionAnswerForum, EventCategories, Events, EventIdeas, EventImages
+from constants import ACCESS_DENIED, DELETE_TESTIMONIAL, DELETE_REVIEW
+from .models import Testimonials, QuestionAnswerForum, EventCategories, Events, EventIdeas, EventImages, EventReviews
 from .serializers import ViewTestimonialSerializer, AddTestimonialSerializer, QuestionAnswersSerializer, \
     AddQuestionSerializer, AddAnswerSerializer, EventCategoriesSerializer, EventsSerializer, GetEventsSerializer, \
-    GetEventCategoriesSerializer, GetEventIdeasSerializer, EventImagesSerializer, EventIdeasSerializer
+    GetEventCategoriesSerializer, GetEventIdeasSerializer, EventImagesSerializer, EventIdeasSerializer, \
+    EventReviewSerializer
 
 
 class ViewTestimonials(generics.GenericAPIView, mixins.ListModelMixin):
@@ -138,7 +140,7 @@ class GetEventsView(generics.GenericAPIView, mixins.ListModelMixin):
     serializer_class = GetEventsSerializer
     queryset = Events.objects.all().order_by('id')
     permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['event_category']
     search_fields = ['event_name', 'event_details']
 
@@ -160,13 +162,22 @@ class GetEventIdeasView(generics.GenericAPIView, mixins.ListModelMixin):
     class to view event ideas and its images
     """
     lookup_field = 'event_id'
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['event_city', 'event_idea']
 
-    def get(self, request, event_id,  *args, **kwargs):
-        event_idea_queryset = EventIdeas.objects.filter(event_id=event_id)
+    def get(self, request, event_id, *args, **kwargs):
+        if request.GET.get('search_city') and request.GET.get('search_idea'):
+            event_idea_queryset = EventIdeas.objects.filter(event_id=event_id,
+                                                            event_idea__contains=request.GET.get('search_idea'),
+                                                            event_city__contains=request.GET.get('search_city'))
+        elif request.GET.get('search_city'):
+            event_idea_queryset = EventIdeas.objects.filter(event_id=event_id,
+                                                            event_city__contains=request.GET.get('search_city'))
+        elif request.GET.get('search_idea'):
+            event_idea_queryset = EventIdeas.objects.filter(event_id=event_id,
+                                                            event_idea__contains=request.GET.get('search_idea'))
+        else:
+            event_idea_queryset = EventIdeas.objects.filter(event_id=event_id)
         event_idea_serializer = GetEventIdeasSerializer(event_idea_queryset, many=True)
-        return Response({'data': event_idea_serializer.data})
+        return Response({'data': event_idea_serializer.data}, status=status.HTTP_200_OK)
 
 
 class EventIdeasViewSet(viewsets.ModelViewSet):
@@ -187,3 +198,37 @@ class EventImagesViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUser]
 
 
+class EventReviewViewSet(viewsets.ModelViewSet):
+    """
+    class for adding, updating and deleting an event review
+    """
+
+    serializer_class = EventReviewSerializer
+    queryset = EventReviews.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        request.data['user'] = request.user.id
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if request.user == instance.user:
+            serializer = self.get_serializer(instance, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return Response(serializer.data)
+        else:
+            return Response({'msg': ACCESS_DENIED}, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if request.user == instance.user:
+            self.perform_destroy(instance)
+            return Response({'msg': DELETE_REVIEW}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({'msg': ACCESS_DENIED}, status=status.HTTP_400_BAD_REQUEST)
