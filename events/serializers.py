@@ -174,6 +174,12 @@ class EventReviewSerializer(serializers.ModelSerializer):
         model = EventReviews
         fields = ['user', 'event_idea_id', 'event_review']
 
+    # user = serializers.SerializerMethodField()
+    #
+    # def get_user(self, obj):
+    #     print(obj.user.username)
+    #     # return obj.user.username
+
 
 class GetEventIdeasSerializer(serializers.ModelSerializer):
     """
