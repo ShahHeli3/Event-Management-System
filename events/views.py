@@ -104,7 +104,7 @@ class AddAnswerView(generics.GenericAPIView, mixins.UpdateModelMixin, mixins.Des
     def put(self, request, id=None):
         instance = self.get_object()
 
-        request.data['user'] = request.user.id
+        request.data['user'] = instance.user
         request.data['question'] = instance.question
         return self.update(request, id)
 
