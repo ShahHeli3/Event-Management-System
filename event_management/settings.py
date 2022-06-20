@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-pc=a_s4b#w5sfmgl%!!=%9ziba!8wk0--qb0v06as)pwynz&za
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = os.environ.get('DEBUG')
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['127.0.0.1', 'heli-event-management.herokuapp.com']
 
