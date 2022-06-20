@@ -45,3 +45,6 @@ DELETE_PROFILE = "Profile deleted"
 ACCESS_DENIED = "Access Denied. You don't have access to other user's data"
 DELETE_TESTIMONIAL = "Your testimonial has been deleted successfully"
 DELETE_REVIEW = "Your event review has been deleted successfully"
+VENDOR_NOT_APPROVED = "Your vendor request hasn't been approved yet. You don't have access to this page until you " \
+                      "are approved. You will get an email when you are approved."
+VENDOR_DELETED = "Your vendor profile has been deleted"
