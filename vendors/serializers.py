@@ -53,6 +53,26 @@ class ApproveVendorSerializer(serializers.ModelSerializer):
         model = VendorRegistration
         fields = ['is_approved']
 
+    def validate(self, attrs):
+        email = self.context.get('email')
+        is_approved = attrs.get('is_approved')
+
+        if is_approved:
+            body = "Congratulations! Your vendor request has been approved."
+            subject = "Vendor Request Approval"
+
+        else:
+            body = "Sorry! Your vendor request has been rejected."
+            subject = "Vendor Request Rejection"
+
+        data = {
+            'subject': subject,
+            'body': body,
+            'to_email': [email]
+        }
+        Util.send_mail(data)
+        return attrs
+
 
 class VendorUpdateSerializer(serializers.ModelSerializer):
     """

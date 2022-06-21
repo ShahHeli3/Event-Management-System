@@ -1,7 +1,10 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, generics, mixins, status
+from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, BasePermission
 from rest_framework.response import Response
 
+from accounts.models import User
 from constants import ACCESS_DENIED, VENDOR_NOT_APPROVED, VENDOR_DELETED
 from vendors.models import VendorCategories, VendorRegistration, VendorImages
 from vendors.serializers import VendorCategoriesSerializer, VendorRegistrationSerializer, ApproveVendorSerializer, \
@@ -53,8 +56,14 @@ class ApproveVendorView(generics.GenericAPIView, mixins.UpdateModelMixin):
     queryset = VendorRegistration.objects.all()
     lookup_field = 'id'
 
-    def put(self, request, id=None):
-        return self.update(request, id)
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object()
+        vendor = User.objects.filter(id=instance.user_id)
+        email = vendor[0].email
+        serializer = self.get_serializer(instance, data=request.data, context={'email': email})
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
 
 class VendorDetails(generics.GenericAPIView, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
@@ -146,6 +155,21 @@ class GetVendorInformationView(generics.GenericAPIView, mixins.RetrieveModelMixi
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+
+
+class GetAllVendors(generics.GenericAPIView, mixins.ListModelMixin):
+    """
+    class to show all vendors of a category
+    """
+    serializer_class = VendorRegistrationSerializer
+    queryset = VendorRegistration.objects.filter(is_approved=True).order_by('id')
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_fields = ['vendor_category']
+    search_fields = ['vendor_details']
+
+    def get(self, request):
+        return self.list(request)
 
 
 

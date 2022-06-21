@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from vendors.views import GetVendorCategoriesView, VendorCategoriesViewSet, VendorRegistrationView, ApproveVendorView, \
-    VendorDetails, VendorImageView, GetVendorInformationView
+    VendorDetails, VendorImageView, GetVendorInformationView, GetAllVendors
 
 router = DefaultRouter()
 router.register('vendor_categories', VendorCategoriesViewSet, basename='vendor_categories')
@@ -15,4 +15,5 @@ urlpatterns = [
     path('add_vendor_images/', VendorImageView.as_view(), name='add_vendor_images'),
     path('vendor_images/<int:id>/', VendorImageView.as_view(), name='vendor_images'),
     path('vendor_information/<int:id>/', GetVendorInformationView.as_view(), name='vendor_information'),
+    path('vendors/', GetAllVendors.as_view(), name='vendors'),
 ] + router.urls
