@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
 from accounts.models import User
+from utils import Util
 from .models import Testimonials, QuestionAnswerForum, EventCategories, Events, EventIdeas, EventImages, EventReviews
-from .utils import Util
 
 
 class ViewTestimonialSerializer(serializers.ModelSerializer):
@@ -10,9 +10,9 @@ class ViewTestimonialSerializer(serializers.ModelSerializer):
     serializer to view testimonials
     """
 
-    user = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
 
-    def get_user(self, obj):
+    def get_username(self, obj):
         try:
             return obj.user.username
         except AttributeError:
@@ -20,7 +20,7 @@ class ViewTestimonialSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Testimonials
-        fields = ['user', 'review']
+        fields = ['id', 'user', 'username', 'review', 'post_date_time']
 
 
 class AddTestimonialSerializer(serializers.ModelSerializer):
@@ -43,7 +43,7 @@ class QuestionAnswersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = QuestionAnswerForum
-        fields = ['user', 'question', 'answer']
+        fields = ['id', 'user', 'question', 'answer', 'post_date_time']
 
     def get_user(self, obj):
         try:
@@ -111,19 +111,9 @@ class AddAnswerSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class GetEventCategoriesSerializer(serializers.ModelSerializer):
-    """
-    serializer to view event categories
-    """
-
-    class Meta:
-        model = EventCategories
-        fields = ['event_category']
-
-
 class EventCategoriesSerializer(serializers.ModelSerializer):
     """
-    serializer to add, update and delete event categories
+    serializer to view, add, update and delete event categories
     """
 
     class Meta:
@@ -138,7 +128,7 @@ class GetEventsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Events
-        fields = ['event_category', 'event_name', 'event_details']
+        fields = ['id', 'event_category', 'event_name', 'event_details']
 
     event_category = serializers.SerializerMethodField()
 
@@ -163,7 +153,7 @@ class EventImagesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EventImages
-        fields = ['event_idea_id', 'event_image', 'event_image_title', 'event_image_details']
+        fields = ['id', 'event_image', 'event_image_title', 'event_image_details']
 
 
 class EventReviewSerializer(serializers.ModelSerializer):
@@ -172,19 +162,15 @@ class EventReviewSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = EventReviews
-        fields = ['user', 'event_idea_id', 'event_review']
-
-    # user = serializers.SerializerMethodField()
-    #
-    # def get_user(self, obj):
-    #     print(obj.user.username)
-    #     # return obj.user.username
+        fields = ['id', 'user', 'event_review', 'post_date_time']
 
 
 class GetEventIdeasSerializer(serializers.ModelSerializer):
     """
     serializer to view event ideas
     """
+
+    # for reference (another way for nesting serializers)
     # images = serializers.SerializerMethodField(read_only=True)
     #
     # def get_images(self, obj):
@@ -196,16 +182,13 @@ class GetEventIdeasSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EventIdeas
-        fields = ['event_idea', 'event_city', 'image_set', 'review_set']
+        fields = ['id', 'event_idea', 'event_city', 'image_set', 'review_set', 'create_date']
 
 
 class EventIdeasSerializer(serializers.ModelSerializer):
     """
-    serializer to insert, update and delete event ideas
+    serializer to add, update and delete event ideas
     """
     class Meta:
         model = EventIdeas
         fields = ['event_id', 'event_idea', 'event_city']
-
-
-

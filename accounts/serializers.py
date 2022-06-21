@@ -3,12 +3,12 @@ from rest_framework import serializers
 
 from constants import PASSWORD_DOES_NOT_MATCH, CURRENT_PASSWORD_CHECK, PASSWORD_RESET_LINK, RESET_EMAIL_BODY, \
     RESET_EMAIL_USER_ERROR, TOKEN_ERROR
+from utils import Util
 from .models import User
 from django.core.exceptions import ValidationError
 from django.utils.encoding import smart_str, force_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from .utils import Util
 from .validations import validate_password
 
 
@@ -22,6 +22,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email', 'username', 'first_name', 'last_name', 'password', 'password2', 'contact_number', 'profile_image']
+
+        # for reference (another way of mentioning new field)
         # extra_kwargs = {
         #     'password': {'write_only': True}
         # }
@@ -92,18 +94,15 @@ class SendPasswordResetEmailSerializer(serializers.Serializer):
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
             user_id = urlsafe_base64_encode(force_bytes(user.id))
-            # print("encoded uid--->", user_id)
             token = PasswordResetTokenGenerator().make_token(user)
-            # print("token--->", token)
             link = PASSWORD_RESET_LINK+user_id+'/'+token
-            # print("link--->", link)
 
             # send mail
             body = RESET_EMAIL_BODY +link
             data = {
                 'subject': 'Reset Your Password',
                 'body': body,
-                'to_email': user.email
+                'to_email': [user.email]
             }
             Util.send_mail(data)
 
@@ -144,7 +143,6 @@ class ResetPasswordSerializer(serializers.Serializer):
             return attrs
 
         except DjangoUnicodeDecodeError:
-            PasswordResetTokenGenerator().check_token((user, token))
             raise ValidationError(TOKEN_ERROR)
 
 

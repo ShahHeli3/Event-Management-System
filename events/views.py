@@ -9,7 +9,7 @@ from constants import ACCESS_DENIED, DELETE_TESTIMONIAL, DELETE_REVIEW
 from .models import Testimonials, QuestionAnswerForum, EventCategories, Events, EventIdeas, EventImages, EventReviews
 from .serializers import ViewTestimonialSerializer, AddTestimonialSerializer, QuestionAnswersSerializer, \
     AddQuestionSerializer, AddAnswerSerializer, EventCategoriesSerializer, EventsSerializer, GetEventsSerializer, \
-    GetEventCategoriesSerializer, GetEventIdeasSerializer, EventImagesSerializer, EventIdeasSerializer, \
+    GetEventIdeasSerializer, EventImagesSerializer, EventIdeasSerializer, \
     EventReviewSerializer
 
 
@@ -19,6 +19,9 @@ class ViewTestimonials(generics.GenericAPIView, mixins.ListModelMixin):
     """
     serializer_class = ViewTestimonialSerializer
     queryset = Testimonials.objects.all().order_by('-post_date_time')
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_fields = ['user']
+    search_fields = ['review']
 
     def get(self, request):
         return self.list(request)
@@ -64,10 +67,12 @@ class QuestionAnswersView(generics.GenericAPIView, mixins.ListModelMixin):
     """
     class to view question and answers
     """
-
     serializer_class = QuestionAnswersSerializer
     queryset = QuestionAnswerForum.objects.all()
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_fields = ['user']
+    search_fields = ['question', 'answer']
 
     def get(self, request):
         return self.list(request)
@@ -87,8 +92,7 @@ class AddQuestionView(generics.GenericAPIView, mixins.CreateModelMixin):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class AddAnswerView(generics.GenericAPIView, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
@@ -116,9 +120,10 @@ class GetEventCategoriesView(generics.GenericAPIView, mixins.ListModelMixin):
     """
     for viewing event categories
     """
-    serializer_class = GetEventCategoriesSerializer
+    serializer_class = EventCategoriesSerializer
     queryset = EventCategories.objects.all().order_by('id')
-    permission_classes = [IsAuthenticated]
+    filter_backends = [SearchFilter]
+    search_fields = ['event_category']
 
     def get(self, request):
         return self.list(request)
@@ -139,7 +144,6 @@ class GetEventsView(generics.GenericAPIView, mixins.ListModelMixin):
     """
     serializer_class = GetEventsSerializer
     queryset = Events.objects.all().order_by('id')
-    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['event_category']
     search_fields = ['event_name', 'event_details']

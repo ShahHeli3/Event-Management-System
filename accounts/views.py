@@ -126,7 +126,7 @@ class UserProfileView(APIView):
 
     def put(self, request):
         user = self.get_object(request)
-        serializer = UserProfileSerializer(user, data=request.data)
+        serializer = UserProfileSerializer(user, data=request.data, partial=True)
 
         if serializer.is_valid():
             serializer.save()

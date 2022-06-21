@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from accounts.models import User
-from events.utils import Util
+from utils import Util
 from .models import VendorCategories, VendorRegistration, VendorImages
 
 
@@ -11,7 +11,7 @@ class VendorCategoriesSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = VendorCategories
-        fields = ['vendor_category']
+        fields = ['id', 'vendor_category']
 
 
 class VendorRegistrationSerializer(serializers.ModelSerializer):
@@ -20,7 +20,7 @@ class VendorRegistrationSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = VendorRegistration
-        fields = ['vendor_category', 'vendor_details', 'user']
+        fields = ['id', 'vendor_category', 'vendor_details', 'user']
 
     def validate(self, attrs):
         """
@@ -89,7 +89,7 @@ class GetVendorUserDetails(serializers.ModelSerializer):
     """
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'contact_number', 'profile_image']
+        fields = ['id', 'first_name', 'last_name', 'email', 'contact_number', 'profile_image']
 
 
 class GetVendorImagesSerializer(serializers.ModelSerializer):
@@ -98,7 +98,7 @@ class GetVendorImagesSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = VendorImages
-        fields = ['vendor_image_title', 'vendor_image', 'vendor_image_details']
+        fields = ['id', 'vendor_image_title', 'vendor_image', 'vendor_image_details']
 
 
 class GetVendorDetailsSerializer(serializers.ModelSerializer):
@@ -116,7 +116,7 @@ class GetVendorDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VendorRegistration
-        fields = ['user_details', 'vendor_details', 'image_set']
+        fields = ['id', 'user_details', 'vendor_details', 'image_set']
 
 
 class VendorImageSerializer(serializers.ModelSerializer):

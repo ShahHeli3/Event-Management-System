@@ -24,6 +24,7 @@ class QuestionAnswerForum(models.Model):
     user = models.ForeignKey(User, on_delete=SET(AnonymousUser.id))
     question = models.TextField()
     answer = models.TextField(null=True)
+    post_date_time = models.DateTimeField(auto_now_add=True)
 
 
 class EventCategories(models.Model):
@@ -75,3 +76,4 @@ class EventReviews(models.Model):
     event_idea_id = models.ForeignKey(EventIdeas, on_delete=models.CASCADE, related_name='review_set')
     user = models.ForeignKey(User, on_delete=SET(AnonymousUser.id), null=True)
     event_review = models.TextField()
+    post_date_time = models.DateTimeField(auto_now_add=True)

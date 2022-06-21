@@ -4,7 +4,7 @@ from constants import USER_MANAGER
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, **kwargs):
+    def create_user(self, *args, **kwargs):
         """
         Creates and saves a User with the given email, username, first_name, last_name, contact_number, profile_image and password
         """
