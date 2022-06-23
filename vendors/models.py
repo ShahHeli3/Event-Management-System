@@ -27,7 +27,7 @@ class VendorImages(models.Model):
     """
     model for vendor images
     """
-    vendor_id = models.ForeignKey(VendorRegistration, on_delete=models.CASCADE, related_name='image_set')
+    vendor = models.ForeignKey(VendorRegistration, on_delete=models.CASCADE, related_name='image_set')
     vendor_image = models.ImageField(upload_to="vendor_images/")
     vendor_image_title = models.CharField(max_length=200)
     vendor_image_details = models.TextField()

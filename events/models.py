@@ -53,7 +53,7 @@ class EventIdeas(models.Model):
     """
     model for event ideas
     """
-    event_id = models.ForeignKey(Events, on_delete=models.CASCADE)
+    event = models.ForeignKey(Events, on_delete=models.CASCADE)
     event_idea = models.TextField()
     event_city = models.CharField(max_length=100)
     create_date = models.DateTimeField(auto_now_add=True)
@@ -63,7 +63,7 @@ class EventImages(models.Model):
     """
     model for event's images
     """
-    event_idea_id = models.ForeignKey(EventIdeas, on_delete=models.CASCADE, related_name='image_set')
+    event_idea = models.ForeignKey(EventIdeas, on_delete=models.CASCADE, related_name='image_set')
     event_image = models.ImageField(upload_to="event_images/")
     event_image_title = models.CharField(max_length=200, null=True)
     event_image_details = models.TextField(null=True)
@@ -73,7 +73,7 @@ class EventReviews(models.Model):
     """
     model for event's reviews
     """
-    event_idea_id = models.ForeignKey(EventIdeas, on_delete=models.CASCADE, related_name='review_set')
+    event_idea = models.ForeignKey(EventIdeas, on_delete=models.CASCADE, related_name='review_set')
     user = models.ForeignKey(User, on_delete=SET(AnonymousUser.id), null=True)
     event_review = models.TextField()
     post_date_time = models.DateTimeField(auto_now_add=True)
