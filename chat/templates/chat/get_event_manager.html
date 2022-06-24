@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>...</title>
+</head>
+<body>
+    <h1>Select the event manager you want to connect with</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="event_managers"><h3>Event Managers</h3></label>
+        <select id="event_managers" name="event_managers">
+            {% for event_manager in event_managers %}
+                <option value="{{ event_manager.id }}">
+                    <p>{{ event_manager.username }} : {{ event_manager.first_name }} {{ event_manager.last_name }}</p>
+                </option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

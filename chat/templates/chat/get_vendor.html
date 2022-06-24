@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>...</title>
+</head>
+<body>
+    <h1>Select the vendor you want to connect with</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="vendors"><h3>Vendors</h3></label>
+        <select id="vendors" name="vendors">
+            {% for vendor in vendors %}
+                <option value="{{ vendor.user.id }}">
+                    <p>{{ vendor.user.username }} : {{ vendor.user.first_name }} {{ vendor.user.last_name }} - {{ vendor.vendor_category.vendor_category }}</p>
+                </option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <button type="submit">Submit</button>
+
+    </form>
+</body>
+</html>
