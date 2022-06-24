@@ -3,7 +3,6 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.views import View
 from django.shortcuts import render
-from rest_framework.renderers import TemplateHTMLRenderer
 
 from accounts.models import User
 from .models import Message
@@ -27,9 +26,8 @@ def create_room(sender, receiver):
     if all_rooms:
         return HttpResponse("Room exists")
     else:
-        create_room = Message.objects.create(sender_user=sender_user, receiver_user=receiver_user,
-                                             room_name=room_name)
-        create_room.save()
+        room = Message.objects.create(sender_user=sender_user, receiver_user=receiver_user, room_name=room_name)
+        room.save()
         return HttpResponse(room_name)
 
 
