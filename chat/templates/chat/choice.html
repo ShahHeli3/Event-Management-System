@@ -7,7 +7,6 @@
 <body>
     <h1>Select whom do you want to connect with</h1>
     <br>
-    {{ user }}
     <form method="post">
         {% csrf_token %}
         <a href="{% url 'get_event_manager' %}">Event Managers</a>

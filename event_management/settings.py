@@ -33,11 +33,19 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'heli-event-management.herokuapp.com']
 
+ASGI_APPLICATION = "event_management.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 # Application definition
 
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

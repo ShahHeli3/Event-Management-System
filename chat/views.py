@@ -2,10 +2,10 @@ import jwt
 from django.db.models import Q
 from django.http import HttpResponse
 from django.views import View
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 
 from accounts.models import User
-from .models import Message
+from .models import Message, Room
 from event_management import settings
 from vendors.models import VendorRegistration
 
@@ -13,22 +13,23 @@ from vendors.models import VendorRegistration
 def create_room(sender, receiver):
     """
 
-    :param sender: user id of the user that sends the message
+    :param sender: user id of the user that wants to send the message
     :param receiver: user id of the user to whom the message is to be sent
     :return: room
     """
     sender_user = User.objects.get(id=sender)
     receiver_user = User.objects.get(id=receiver)
     room_name = f"{sender}_and_{receiver}"
-    room = f"{receiver}_and_{sender}"
-    all_rooms = Message.objects.filter(Q(room_name=room_name) | Q(room_name=room))
+    room_name_2 = f"{receiver}_and_{sender}"
+    all_rooms = Room.objects.filter(Q(room_name=room_name) | Q(room_name=room_name_2))
 
     if all_rooms:
-        return HttpResponse("Room exists")
+        room_name = all_rooms[0].room_name
+        return room_name
     else:
-        room = Message.objects.create(sender_user=sender_user, receiver_user=receiver_user, room_name=room_name)
-        room.save()
-        return HttpResponse(room_name)
+        new_room = Room.objects.create(sender_user=sender_user, receiver_user=receiver_user, room_name=room_name)
+        new_room.save()
+        return new_room
 
 
 class UserValidationView(View):
@@ -42,11 +43,9 @@ class UserValidationView(View):
     def post(self, request):
         token = request.POST['token']
         valid_data = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=['HS256'])
-        user = valid_data['user_id']
-        del request.session['user']
-        request.session.modified = True
-        request.session['user'] = user
-        return render(request, 'chat/choice.html', {'user': user})
+        sender = valid_data['user_id']
+        request.session['user'] = sender
+        return render(request, 'chat/choice.html', {'user': sender})
 
 
 class GetEventManagers(View):
@@ -60,7 +59,9 @@ class GetEventManagers(View):
     def post(self, request):
         sender = request.session.get('user')
         receiver = request.POST['event_managers']
-        return create_room(sender, receiver)
+        request.session['receiver_user'] = receiver
+        room_name = create_room(sender, receiver)
+        return redirect('room', room_name=room_name)
 
 
 class GetVendors(View):
@@ -72,6 +73,31 @@ class GetVendors(View):
         return render(request, 'chat/get_vendor.html', {'vendors': vendors})
 
     def post(self, request):
-        sender = int(request.session.get('user'))
-        receiver = int(request.POST['vendors'])
-        return create_room(sender, receiver)
+        sender = request.session.get('user')
+        receiver = request.POST['vendors']
+        request.session['receiver_user'] = receiver
+        room_name = create_room(sender, receiver)
+        return redirect('room', room_name=room_name)
+
+
+class ChatRoom(View):
+    template_name = 'chat/testing.html'
+    queryset = Room.objects.all()
+
+    def get(self, request, room_name, *args, **kwargs):
+        get_room = get_object_or_404(Room, room_name=self.kwargs.get('room_name'))
+        sender = request.session.get('user')
+        sender_obj = User.objects.get(id=sender)
+        sender_name = sender_obj.username
+        receiver = request.session.get('receiver_user')
+        messages = Message.objects.filter(Q(sender_user=sender, receiver_user=receiver) |
+                                         Q(sender_user=receiver, receiver_user=sender)).order_by('timestamp')
+
+        return render(request, 'chat/room.html', {
+            'room_name': room_name,
+            'sender_id': sender,
+            'receiver_id': receiver,
+            'messages': messages,
+            'sender_name': sender_name
+        })
+
