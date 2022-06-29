@@ -1,8 +1,8 @@
 import jwt
 from django.db.models import Q
-from django.http import HttpResponse
 from django.views import View
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.cache import never_cache
 
 from accounts.models import User
 from .models import Message, Room
@@ -12,7 +12,6 @@ from vendors.models import VendorRegistration
 
 def create_room(sender, receiver):
     """
-
     :param sender: user id of the user that wants to send the message
     :param receiver: user id of the user to whom the message is to be sent
     :return: room
@@ -44,8 +43,11 @@ class UserValidationView(View):
         token = request.POST['token']
         valid_data = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=['HS256'])
         sender = valid_data['user_id']
+        request.session.flush()
         request.session['user'] = sender
-        return render(request, 'chat/choice.html', {'user': sender})
+        request.session['token'] = token
+        rooms = Room.objects.filter(Q(sender_user=sender) | Q(receiver_user=sender))
+        return render(request, 'chat/choice.html', {'user': sender, 'rooms': rooms})
 
 
 class GetEventManagers(View):
@@ -81,15 +83,21 @@ class GetVendors(View):
 
 
 class ChatRoom(View):
-    template_name = 'chat/testing.html'
     queryset = Room.objects.all()
 
+    @never_cache
     def get(self, request, room_name, *args, **kwargs):
-        get_room = get_object_or_404(Room, room_name=self.kwargs.get('room_name'))
+        room = Room.objects.get(room_name=self.kwargs.get("room_name"))
+        get_room = get_object_or_404(Room, room_name=room)
         sender = request.session.get('user')
         sender_obj = User.objects.get(id=sender)
         sender_name = sender_obj.username
-        receiver = request.session.get('receiver_user')
+
+        if room.receiver_user.id == sender:
+            receiver = room.sender_user.id
+        else:
+            receiver = room.receiver_user.id
+
         messages = Message.objects.filter(Q(sender_user=sender, receiver_user=receiver) |
                                          Q(sender_user=receiver, receiver_user=sender)).order_by('timestamp')
 
@@ -100,4 +108,6 @@ class ChatRoom(View):
             'messages': messages,
             'sender_name': sender_name
         })
+
+
 

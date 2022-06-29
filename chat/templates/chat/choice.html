@@ -1,18 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Title</title>
+    <meta charset="UTF-8">
+    <title>Rooms</title>
 </head>
 <body>
-    <h1>Select whom do you want to connect with</h1>
+    <form id="exists" method="get">
+        {% for room in rooms %}
+
+            {% if room.receiver_user.id == user %}
+                <br><a href="{{ room }}">{{ room.sender_user }}</a><br>
+            {% else %}
+                <br><a href="{{ room }}">{{ room.receiver_user }}</a><br>
+
+            {% endif %}
+        {% endfor %}
+    </form>
+    <br><br>
+    <h2>New Chat?</h2>
+    <h3>Select whom do you want to connect with</h3>
     <br>
-    <form method="post">
+    <form id="new_chat" method="post">
         {% csrf_token %}
         <a href="{% url 'get_event_manager' %}">Event Managers</a>
         <br> <br>
         <a href="{% url 'get_vendor' %}">Vendors</a>
     </form>
-
 </body>
 </html>
