@@ -5,6 +5,9 @@
     <title>Chat</title>
 </head>
 <body>
+    {% if error %}
+        <h3 style="color: red">Invalid token : {{ error }}</h3>
+    {% endif %}
     <h1>Enter your username and access token for validation</h1>
     <form method="post">
         {% csrf_token %}

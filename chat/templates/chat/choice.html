@@ -5,26 +5,21 @@
     <title>Rooms</title>
 </head>
 <body>
-    <form id="exists" method="get">
-        {% for room in rooms %}
+    {% for room in rooms %}
 
-            {% if room.receiver_user.id == user %}
-                <br><a href="{{ room }}">{{ room.sender_user }}</a><br>
-            {% else %}
-                <br><a href="{{ room }}">{{ room.receiver_user }}</a><br>
+        {% if room.receiver_user.id == user %}
+            <br><a href="{{ room }}">{{ room.sender_user }}</a><br>
+        {% else %}
+            <br><a href="{{ room }}">{{ room.receiver_user }}</a><br>
 
-            {% endif %}
-        {% endfor %}
-    </form>
+        {% endif %}
+    {% endfor %}
     <br><br>
     <h2>New Chat?</h2>
     <h3>Select whom do you want to connect with</h3>
     <br>
-    <form id="new_chat" method="post">
-        {% csrf_token %}
-        <a href="{% url 'get_event_manager' %}">Event Managers</a>
-        <br> <br>
-        <a href="{% url 'get_vendor' %}">Vendors</a>
-    </form>
+    <a href="{% url 'get_event_manager' %}">Event Managers</a>
+    <br> <br>
+    <a href="{% url 'get_vendor' %}">Vendors</a>
 </body>
 </html>

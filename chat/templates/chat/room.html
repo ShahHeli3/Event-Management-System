@@ -3,19 +3,31 @@
 <head>
     <meta charset="utf-8"/>
     <title>Chat Room</title>
+    <style>
+        div.scroll{
+            background-color:#F9F3EE;
+            width:90%;
+            height:580PX;
+            margin-left: 1%;
+            padding: 1%;
+            overflow-y:scroll;
+        }
+    </style>
 </head>
 <body>
-<div id="chat-log" cols="100" rows="20">
+
+<div id="chat-log" class="scroll">
 
     {% for message in messages %}
-        <p>{{ message.sender_user }} : {{ message.message }}</p>
+            <p>{{ message.sender_user }} : {{ message.message }}</p>
     {% endfor %}
 
 </div>
 
-<br>
-<input id="chat-message-input" type="text" size="60">&nbsp;
-<input id="chat-message-submit" type="button" value="Send">
+<div style="margin-left: 1%; padding-top: 1%">
+    <input id="chat-message-input" type="text" size="60" style="width: 80%">&nbsp;
+    <input id="chat-message-submit" type="button" value="Send" style="width: 10%">
+</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
