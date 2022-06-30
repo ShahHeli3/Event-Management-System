@@ -1,2 +1,3 @@
 web: gunicorn event_management.wsgi
+web: daphne event_management.asgi:application --port $PORT --bind 0.0.0.0 -v2
 worker: python manage.py runworker --settings=event_management.settings -v2
