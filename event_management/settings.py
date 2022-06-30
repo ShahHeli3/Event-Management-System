@@ -38,8 +38,7 @@ ASGI_APPLICATION = "event_management.asgi.application"
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
-        "CONFIG": [('127.0.0.1', 6379, 'heli-event-management.herokuapp.com')]
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
     }
 }
 
