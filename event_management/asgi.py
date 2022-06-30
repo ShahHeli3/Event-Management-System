@@ -8,7 +8,7 @@ https://docs.djangoproject.com/en/4.0/howto/deployment/asgi/
 """
 
 import os
-from chat import routing
+import chat.routing
 
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
@@ -24,7 +24,7 @@ application = ProtocolTypeRouter({
   "websocket": AllowedHostsOriginValidator(
         AuthMiddlewareStack(
             URLRouter(
-                routing.websocket_urlpatterns
+                chat.routing.websocket_urlpatterns
             )
         )
     ),
