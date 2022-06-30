@@ -33,16 +33,17 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'heli-event-management.herokuapp.com']
 
+
 ASGI_APPLICATION = "event_management.asgi.application"
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        "CONFIG": [('127.0.0.1', 6379, 'heli-event-management.herokuapp.com')]
     }
 }
 
 # Application definition
-
 
 INSTALLED_APPS = [
     'channels',
