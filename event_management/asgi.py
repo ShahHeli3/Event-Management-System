@@ -20,7 +20,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'event_management.settings')
 django_asgi_app = get_asgi_application()
 
 application = ProtocolTypeRouter({
-  "http": django_asgi_app,
+  "https": django_asgi_app,
   "websocket": AllowedHostsOriginValidator(
         AuthMiddlewareStack(
             URLRouter(
