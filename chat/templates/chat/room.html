@@ -61,6 +61,7 @@
 
 
         $("#chat-log").append("<p>" + data.sender_name + " : " + data.message + "</p>");
+        $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
 
     };
 
@@ -78,13 +79,16 @@
     document.querySelector('#chat-message-submit').onclick = function (e) {
         const messageInputDom = document.querySelector('#chat-message-input');
         const message = messageInputDom.value;
-        chatSocket.send(JSON.stringify({
-            'message': message,
-            'sender': sender,
-            'receiver': receiver,
-            'sender_name': sender_name
-        }));
-        messageInputDom.value = '';
+
+        if(message.trim().length !== 0) {
+            chatSocket.send(JSON.stringify({
+                'message': message,
+                'sender': sender,
+                'receiver': receiver,
+                'sender_name': sender_name
+            }));
+            messageInputDom.value = '';
+        }
     };
 
 
