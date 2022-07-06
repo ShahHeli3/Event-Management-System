@@ -10,7 +10,6 @@ class TestUrls(APISimpleTestCase):
     class to test all the urls of accounts app
     """
 
-
     def check_urls(self, url, view):
         """
         function to test if the given url matches with its view

@@ -309,9 +309,9 @@ class TestViews(APITestCase):
         response = self.client.post(url, {'password': 'Abc@1234', 'password2': 'Abc@1234'})
         self.assertEqual(response.status_code, 200)
 
-    def test_get_profile_fails_if_user_is_unauthenticated(self):
+    def test_access_profile_fails_if_user_is_unauthenticated(self):
         """
-        user cannot get/view his/her profile if not authenticated
+        user cannot access his/her profile if not authenticated
         """
         response = self.client.get(self.profile_url)
         self.assertEqual(response.status_code, 401)
@@ -324,4 +324,59 @@ class TestViews(APITestCase):
         self.client.force_authenticate(user=user)
         response = self.client.get(self.profile_url)
         self.assertEqual(response.status_code, 200)
+
+    def update_profile(self, field, value):
+        """
+        function for update profile
+
+        :param field: field_name of the model to be updated
+        :param value: value of the field that is passed
+        :return: response of the 'put' testing
+        """
+        user = User.objects.get(username='test')
+        self.client.force_authenticate(user=user)
+
+        data = {
+            field: value
+        }
+
+        return self.client.put(self.profile_url, data)
+
+    def test_update_profile_fails_if_data_is_invalid(self):
+        """
+        update profile fails if the data entered is not valid or not unique
+        """
+        invalid_email_response = self.update_profile('email', 'heli.com')
+        self.assertEqual(invalid_email_response.status_code, 400)
+
+        invalid_contact_number_response = self.update_profile('contact_number', '+9112345678')
+        self.assertEqual(invalid_contact_number_response.status_code, 400)
+
+    def test_update_profile_successful(self):
+        """
+        profile can be updated successfully if valid data is passed
+        """
+        first_name_response = self.update_profile('first_name', 'Heli')
+        self.assertEqual(first_name_response.status_code, 200)
+
+        username_response = self.update_profile('username', 'heli_shah')
+        self.assertEqual(username_response.status_code, 200)
+
+    def test_delete_profile_unsuccessful(self):
+        """
+        delete profile fails if user is not authenticated
+        """
+        response = self.client.delete(self.profile_url)
+        self.assertEqual(response.status_code, 401)
+
+    def test_delete_profile_successful(self):
+        """
+        delete profile successful
+        """
+        user = User.objects.get(username='test')
+        self.client.force_authenticate(user=user)
+
+        response = self.client.delete(self.profile_url)
+        self.assertEqual(response.status_code, 204)
+
 
