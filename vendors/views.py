@@ -68,7 +68,7 @@ class ApproveVendorView(generics.GenericAPIView, mixins.UpdateModelMixin):
 
 class VendorDetails(generics.GenericAPIView, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
     """
-    class to update vendor details
+    class to update vendor details and delete vendor
     """
     serializer_class = VendorUpdateSerializer
     permission_classes = [IsAuthenticated]

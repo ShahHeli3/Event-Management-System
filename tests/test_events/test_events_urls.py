@@ -8,7 +8,7 @@ from events.views import ViewTestimonials, TestimonialsViewSet, QuestionAnswersV
 
 class TestUrls(APISimpleTestCase):
     """
-    class to test all the urls of accounts app
+    class to test all the urls of events app
     """
 
     def check_urls(self, url, view):
@@ -23,7 +23,7 @@ class TestUrls(APISimpleTestCase):
         """
         function to test if the given router matches with its viewset
         :param router: url to be tested
-        :param view_set: viewset connected to the url
+        :param viewset: viewset connected to the url
         """
         self.assertEqual(resolve(router).func.cls, viewset)
 
