@@ -153,7 +153,7 @@ class EventImagesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EventImages
-        fields = ['id', 'event_image', 'event_image_title', 'event_image_details']
+        fields = ['id', 'event_idea', 'event_image', 'event_image_title', 'event_image_details']
 
 
 class EventReviewSerializer(serializers.ModelSerializer):
@@ -162,7 +162,7 @@ class EventReviewSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = EventReviews
-        fields = ['id', 'user', 'event_review', 'post_date_time']
+        fields = ['id', 'user', 'event_review', 'post_date_time', 'event_idea']
 
 
 class GetEventIdeasSerializer(serializers.ModelSerializer):
@@ -191,4 +191,4 @@ class EventIdeasSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = EventIdeas
-        fields = ['event_id', 'event_idea', 'event_city']
+        fields = ['event', 'event_idea', 'event_city']

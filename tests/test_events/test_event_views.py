@@ -1,3 +1,5 @@
+from django.core.files import File
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
@@ -36,6 +38,19 @@ class TestViews(APITestCase):
         self.create_event_idea = EventIdeas.objects.create(event=self.create_event, event_idea='Test Idea',
                                                            event_city='Test event city')
         self.event_idea_id = self.create_event_idea.id
+
+        with open('media/default.jpg') as fp:
+            self.event_image = fp.name
+
+        self.create_event_image = EventImages.objects.create(event_idea=self.create_event_idea,
+                                                             event_image=self.event_image,
+                                                             event_image_title='Test event image title',
+                                                             event_image_details='Test event image details')
+        self.image_id = self.create_event_image.id
+
+        self.create_event_review = EventReviews.objects.create(event_idea=self.create_event_idea, user=self.normal_user,
+                                                               event_review='Test event reviews')
+        self.event_review_id = self.create_event_review.id
 
     def test_view_testimonials_successful(self):
         """
@@ -393,21 +408,20 @@ class TestViews(APITestCase):
                                     format='json')
         self.assertEqual(response.status_code, 403)
 
-    # def test_post_event_idea_successful(self):
-    #     """
-    #     only event managers(admin users) can add an event idea
-    #     """
-    #     user = User.objects.get(username='admin')
-    #     self.client.force_authenticate(user=user)
-    #
-    #     event = Events.objects.get(id=self.event_id).id
-    #
-    #     response = self.client.post(reverse('event_ideas-list'), {"event_idea": "Hungrito",
-    #                                                               "event_city": "Ahmedabad",
-    #                                                               "event_id": 20},
-    #                                 format='json')
-    #     print(response)
-    #     self.assertEqual(response.status_code, 201)
+    def test_post_event_idea_successful(self):
+        """
+        only event managers(admin users) can add an event idea
+        """
+        user = User.objects.get(username='admin')
+        self.client.force_authenticate(user=user)
+
+        event = Events.objects.get(id=self.event_id).id
+
+        response = self.client.post(reverse('event_ideas-list'), {"event_idea": "Test Event Idea",
+                                                                  "event_city": "Test City",
+                                                                  "event": event},
+                                    format='json')
+        self.assertEqual(response.status_code, 201)
 
     def test_update_event_ideas_fails_if_unauthorized(self):
         """
@@ -419,11 +433,10 @@ class TestViews(APITestCase):
         event_idea = EventIdeas.objects.get(id=self.event_idea_id).id
         event = Events.objects.get(id=self.event_id).id
 
-        response = self.client.put(reverse('event_ideas-detail', kwargs={'pk': event_idea}),
-                                    {'event_id': event,
-                                     'event_idea': 'Test idea',
-                                     'event_city': 'Test City'},
-                                    format='json')
+        response = self.client.put(reverse('event_ideas-detail', kwargs={'pk': event_idea}), {'event': event,
+                                                                                              'event_idea': 'Test idea',
+                                                                                              'event_city': 'TestCity'},
+                                   format='json')
 
         self.assertEqual(response.status_code, 403)
 
@@ -438,9 +451,8 @@ class TestViews(APITestCase):
         event = Events.objects.get(id=self.event_id).id
 
         response = self.client.put(reverse('event_ideas-detail', kwargs={'pk': event_idea}),
-                                   {'event_id': event,
-                                    'event_idea': 'Test idea',
-                                    'event_city': 'Test City'},
+                                   {'event': event, 'event_idea': 'Test update event idea',
+                                    'event_city': 'Test update event idea City'},
                                    format='json')
 
         self.assertEqual(response.status_code, 200)
@@ -467,4 +479,229 @@ class TestViews(APITestCase):
         event_idea = EventIdeas.objects.get(id=self.event_idea_id).id
 
         response = self.client.delete(reverse('event_ideas-detail', kwargs={'pk': event_idea}))
+        self.assertEqual(response.status_code, 204)
+
+    def test_cannot_add_event_images_if_unauthorized(self):
+        """
+        unauthorized users cannot post event images
+        """
+        user = User.objects.get(username='heli')
+        self.client.force_authenticate(user=user)
+
+        event_idea = EventIdeas.objects.get(id=self.event_idea_id).id
+        image_data = File(open('media/default.jpg', 'rb'))
+        image = SimpleUploadedFile('image.jpg', image_data.read(), content_type='multipart/form-data')
+
+        response = self.client.post(reverse('event_images-list'), {'event_image': image,
+                                                                   'event_image_title': 'Test event image',
+                                                                   'event_image_details': 'Test event image details',
+                                                                   'event_idea': event_idea},
+                                    format='multipart')
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_add_event_images_fails_if_wrong_format(self):
+        """
+        image files other than .jpg, .png and .jpeg cannot be added
+        """
+        user = User.objects.get(username='admin')
+        self.client.force_authenticate(user=user)
+
+        event_idea = EventIdeas.objects.get(id=self.event_idea_id).id
+        image_data = File(open('requirements.txt', 'rb'))
+        image = SimpleUploadedFile('image.jpg', image_data.read(), content_type='multipart/form-data')
+
+        response = self.client.post(reverse('event_images-list'),
+                                    {'event_image': image,
+                                     'event_image_title': 'Test event image',
+                                     'event_image_details': 'Test event image details',
+                                     'event_idea': event_idea},
+                                    format='multipart')
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_add_event_images_successful(self):
+        """
+        only event managers(admin users) can add an event images
+        """
+        user = User.objects.get(username='admin')
+        self.client.force_authenticate(user=user)
+
+        event_idea = EventIdeas.objects.get(id=self.event_idea_id).id
+        image_data = File(open('media/default.jpg', 'rb'))
+        image = SimpleUploadedFile('image.jpg', image_data.read(), content_type='multipart/form-data')
+
+        response = self.client.post(reverse('event_images-list'),
+                                    {'event_image': image,
+                                     'event_image_title': 'Test event image',
+                                     'event_image_details': 'Test event image details',
+                                     'event_idea': event_idea}, format='multipart')
+
+        self.assertEqual(response.status_code, 201)
+
+    def test_cannot_update_event_images_if_unauthorized(self):
+        """
+        unauthorized users cannot update event images
+        """
+        user = User.objects.get(username='heli')
+        self.client.force_authenticate(user=user)
+
+        event_idea = EventIdeas.objects.get(id=self.event_idea_id).id
+        image_data = File(open('media/default.jpg', 'rb'))
+        image = SimpleUploadedFile('image.jpg', image_data.read(), content_type='multipart/form-data')
+
+        image_id = EventImages.objects.get(id=self.image_id).id
+
+        response = self.client.put(reverse('event_images-detail', kwargs={'pk': image_id}),
+                                   {'event_image': image,
+                                    'event_image_title': 'Test event image',
+                                    'event_image_details': 'Test event image details',
+                                    'event_idea': event_idea}, format='multipart')
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_update_event_images_fails_if_wrong_format(self):
+        """
+        images cannot be updated/replaced with files other than .jpg, .jpeg and .png formats
+        """
+        user = User.objects.get(username='admin')
+        self.client.force_authenticate(user=user)
+
+        event_idea = EventIdeas.objects.get(id=self.event_idea_id).id
+        image_data = File(open('requirements.txt', 'rb'))
+        image = SimpleUploadedFile('image.jpg', image_data.read(), content_type='multipart/form-data')
+
+        image_id = EventImages.objects.get(id=self.image_id).id
+
+        response = self.client.put(reverse('event_images-detail', kwargs={'pk': image_id}),
+                                   {'event_image': image,
+                                    'event_image_title': 'Test event image',
+                                    'event_image_details': 'Test event image details',
+                                    'event_idea': event_idea}, format='multipart')
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_event_images_successful(self):
+        """
+        only event managers(admin users) can update an event image
+        """
+        user = User.objects.get(username='admin')
+        self.client.force_authenticate(user=user)
+
+        event_idea = EventIdeas.objects.get(id=self.event_idea_id).id
+        image_data = File(open('media/default.jpg', 'rb'))
+        image = SimpleUploadedFile('image.jpg', image_data.read(), content_type='multipart/form-data')
+
+        image_id = EventImages.objects.get(id=self.image_id).id
+
+        response = self.client.put(reverse('event_images-detail', kwargs={'pk': image_id}),
+                                   {'event_image': image,
+                                    'event_image_title': 'Test event image',
+                                    'event_image_details': 'Test event image details',
+                                    'event_idea': event_idea}, format='multipart')
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_cannot_delete_event_images_if_unauthorized(self):
+        """
+        unauthorized users cannot delete event images
+        """
+        user = User.objects.get(username='heli')
+        self.client.force_authenticate(user=user)
+
+        image_id = EventImages.objects.get(id=self.image_id).id
+        response = self.client.delete(reverse('event_images-detail', kwargs={'pk': image_id}))
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_delete_event_images_successful(self):
+        """
+        only event managers(admin users) can delete an event images
+        """
+        user = User.objects.get(username='admin')
+        self.client.force_authenticate(user=user)
+
+        image_id = EventImages.objects.get(id=self.image_id).id
+        response = self.client.delete(reverse('event_images-detail', kwargs={'pk': image_id}))
+
+        self.assertEqual(response.status_code, 204)
+
+    def test_add_event_review_fails_if_unauthenticated(self):
+        """
+        event review cannot be posted if user is unauthenticated
+        """
+        user = User.objects.get(username='heli').id
+        response = self.client.post(reverse('event_reviews-list'), {'user': user, 'event_review': 'Test event review'},
+                                    format='json')
+        self.assertEqual(response.status_code, 401)
+
+    def test_add_event_review_successful(self):
+        """
+        event review can be posted if user is authenticated
+        """
+        user = User.objects.get(username='heli')
+        self.client.force_authenticate(user=user)
+
+        event_idea = EventIdeas.objects.get(id=self.event_idea_id).id
+
+        response = self.client.post(reverse('event_reviews-list'), {'user': user.id, 'event_idea': event_idea,
+                                                                    'event_review': 'Test event review'}, format='json')
+        self.assertEqual(response.status_code, 201)
+
+    def test_cannot_update_event_review_if_unauthorized(self):
+        """
+        no user can update other user's reviews
+        """
+        user = User.objects.get(username='admin')
+        self.client.force_authenticate(user=user)
+
+        event_review = EventReviews.objects.get(id=self.event_review_id)
+        event_idea = EventIdeas.objects.get(id=self.event_idea_id).id
+
+        response = self.client.put(reverse('event_reviews-detail', kwargs={'pk': event_review.id}),
+                                   {'user': user.id, 'event_idea': event_idea, 'event_review': 'Test event review'},
+                                   format='json')
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_event_review_successful(self):
+        """
+        user can update his/her own review
+        """
+        user = User.objects.get(username='heli')
+        self.client.force_authenticate(user=user)
+
+        event_review = EventReviews.objects.get(id=self.event_review_id)
+        event_idea = EventIdeas.objects.get(id=self.event_idea_id).id
+
+        response = self.client.put(reverse('event_reviews-detail', kwargs={'pk': event_review.id}),
+                                   {'user': user.id, 'event_idea': event_idea, 'event_review': 'Test event review'},
+                                   format='json')
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_cannot_delete_event_review_if_unauthorized(self):
+        """
+        no user can delete other user's reviews
+        """
+        user = User.objects.get(username='admin')
+        self.client.force_authenticate(user=user)
+
+        event_review = EventReviews.objects.get(id=self.event_review_id)
+
+        response = self.client.delete(reverse('event_reviews-detail', kwargs={'pk': event_review.id}))
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_delete_event_review_successful(self):
+        """
+        user can delete his/her own review
+        """
+        user = User.objects.get(username='heli')
+        self.client.force_authenticate(user=user)
+
+        event_review = EventReviews.objects.get(id=self.event_review_id)
+
+        response = self.client.delete(reverse('event_reviews-detail', kwargs={'pk': event_review.id}))
+
         self.assertEqual(response.status_code, 204)
