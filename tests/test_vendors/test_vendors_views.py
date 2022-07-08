@@ -249,57 +249,120 @@ class TestViews(APITestCase):
 
         self.assertEqual(response.status_code, 201)
 
-    # def test_cannot_update_vendor_images_if_unauthorized(self):
-    #     """
-    #     unauthorized users cannot update other vendor's images
-    #     """
-    #     user = User.objects.get(username='admin')
-    #     self.client.force_authenticate(user=user)
-    #
-    #     vendor_image = VendorImages.objects.get(id=self.vendor_image_id).id
-    #     image_data = File(open('media/default.jpg', 'rb'))
-    #     image = SimpleUploadedFile('image.jpg', image_data.read(), content_type='multipart/form-data')
-    #
-    #     response = self.client.put(reverse('vendor_images', kwargs={'id': vendor_image}),
-    #                                {'vendor_image': image,
-    #                                 'vendor_image_title': 'Test vendor image title',
-    #                                 'vendor_image_details': 'Test vendor image details'}, format='multipart')
-    #
-    #     self.assertEqual(response.status_code, 403)
+    def test_cannot_update_vendor_images_if_unauthorized(self):
+        """
+        unauthorized users cannot update other vendor's images
+        """
+        user = User.objects.get(username='admin')
+        self.client.force_authenticate(user=user)
 
-    # def test_update_event_images_fails_if_wrong_format(self):
-    #     """
-    #     images cannot be updated/replaced with files other than .jpg, .jpeg and .png formats
-    #     """
-    #     user = User.objects.get(username='admin')
-    #     self.client.force_authenticate(user=user)
-    #
-    #     vendor_image = VendorImages.objects.get(id=self.vendor_image_id).id
-    #     image_data = File(open('requirements.txt', 'rb'))
-    #     image = SimpleUploadedFile('image.jpg', image_data.read(), content_type='multipart/form-data')
-    #
-    #     response = self.client.put(reverse('vendor_images', kwargs={'id': vendor_image}),
-    #                                {'vendor_image': image,
-    #                                 'vendor_image_title': 'Test vendor image title',
-    #                                 'vendor_image_details': 'Test vendor image details'}, format='multipart')
-    #
-    #     self.assertEqual(response.status_code, 400)
-    #
-    # def test_update_event_images_successful(self):
-    #     """
-    #     only event managers(admin users) can update an event image
-    #     """
-    #     user = User.objects.get(username='admin')
-    #     self.client.force_authenticate(user=user)
-    #
-    #     vendor_image = VendorImages.objects.get(id=self.vendor_image_id).id
-    #     image_data = File(open('media/default.jpg', 'rb'))
-    #     image = SimpleUploadedFile('image.jpg', image_data.read(), content_type='multipart/form-data')
-    #
-    #     response = self.client.put(reverse('vendor_images', kwargs={'id': vendor_image}),
-    #                                {'vendor_image': image,
-    #                                 'vendor_image_title': 'Test vendor image title',
-    #                                 'vendor_image_details': 'Test vendor image details'}, format='multipart')
-    #
-    #     self.assertEqual(response.status_code, 200)
+        vendor_image = VendorImages.objects.get(id=self.vendor_image_id).id
+        image_data = File(open('media/default.jpg', 'rb'))
+        image = SimpleUploadedFile('image.jpg', image_data.read(), content_type='multipart/form-data')
 
+        response = self.client.put(reverse('vendor_images', kwargs={'id': vendor_image}),
+                                   {'vendor_image': image,
+                                    'vendor_image_title': 'Test vendor image title',
+                                    'vendor_image_details': 'Test vendor image details'}, format='multipart')
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_event_images_fails_if_wrong_format(self):
+        """
+        images cannot be updated/replaced with files other than .jpg, .jpeg and .png formats
+        """
+        user = User.objects.get(username='heli')
+        self.client.force_authenticate(user=user)
+
+        vendor_image = VendorImages.objects.get(id=self.vendor_image_id).id
+        image_data = File(open('requirements.txt', 'rb'))
+        image = SimpleUploadedFile('image.jpg', image_data.read(), content_type='multipart/form-data')
+
+        response = self.client.put(reverse('vendor_images', kwargs={'id': vendor_image}),
+                                   {'vendor_image': image,
+                                    'vendor_image_title': 'Test vendor image title',
+                                    'vendor_image_details': 'Test vendor image details'}, format='multipart')
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_event_images_successful(self):
+        """
+        images can only be updated by the vendor himself
+        """
+        user = User.objects.get(username='heli')
+        self.client.force_authenticate(user=user)
+
+        vendor_image = VendorImages.objects.get(id=self.vendor_image_id).id
+        image_data = File(open('media/default.jpg', 'rb'))
+        image = SimpleUploadedFile('image.jpg', image_data.read(), content_type='multipart/form-data')
+
+        response = self.client.put(reverse('vendor_images', kwargs={'id': vendor_image}),
+                                   {'vendor_image': image,
+                                    'vendor_image_title': 'Test vendor image title',
+                                    'vendor_image_details': 'Test vendor image details'}, format='multipart')
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_cannot_delete_vendor_images_if_unauthorized(self):
+        """
+        unauthorized users cannot delete other vendor's images
+        """
+        user = User.objects.get(username='admin')
+        self.client.force_authenticate(user=user)
+
+        vendor_image = VendorImages.objects.get(id=self.vendor_image_id).id
+
+        response = self.client.delete(reverse('vendor_images', kwargs={'id': vendor_image}))
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_delete_event_images_successful(self):
+        """
+        images can only be deleted by the vendor himself
+        """
+        user = User.objects.get(username='heli')
+        self.client.force_authenticate(user=user)
+
+        vendor_image = VendorImages.objects.get(id=self.vendor_image_id).id
+
+        response = self.client.delete(reverse('vendor_images', kwargs={'id': vendor_image}))
+
+        self.assertEqual(response.status_code, 204)
+
+    def test_get_vendor_information_fails_if_unauthenticated(self):
+        """
+        unauthorized users cannot view vendors' information
+        """
+        vendor = VendorRegistration.objects.get(pk=self.vendor_id).id
+
+        response = self.client.get(reverse('vendor_information', kwargs={'id': vendor}))
+        self.assertEqual(response.status_code, 401)
+
+    def test_get_vendor_information_successful(self):
+        """
+        authorized users cannot view vendors' information
+        """
+        user = User.objects.get(username='heli')
+        self.client.force_authenticate(user=user)
+
+        vendor = VendorRegistration.objects.get(pk=self.vendor_id).id
+
+        response = self.client.get(reverse('vendor_information', kwargs={'id': vendor}))
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_all_vendors_fails_if_unauthenticated(self):
+        """
+        unauthorized users cannot view vendors
+        """
+        response = self.client.get(reverse('vendors'))
+        self.assertEqual(response.status_code, 401)
+
+    def test_get_all_vendors_successful(self):
+        """
+        authorized users cannot view vendors' information
+        """
+        user = User.objects.get(username='heli')
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get(reverse('vendors'))
+        self.assertEqual(response.status_code, 200)

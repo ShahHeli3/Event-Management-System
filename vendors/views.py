@@ -118,11 +118,12 @@ class VendorImageView(generics.GenericAPIView, mixins.CreateModelMixin, mixins.U
 
     def put(self, request, *args, **kwargs):
         instance = self.get_object()
-        vendor = instance.vendor_id_id
+        vendor = instance.vendor_id
         user = VendorRegistration.objects.filter(id=vendor)
 
         if user[0].user_id == request.user.id:
-            request.data['vendor_id'] = vendor
+            request.data._mutable = True
+            request.data['vendor'] = vendor
             serializer = self.get_serializer(instance, data=request.data)
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
@@ -132,7 +133,7 @@ class VendorImageView(generics.GenericAPIView, mixins.CreateModelMixin, mixins.U
 
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
-        vendor = instance.vendor_id_id
+        vendor = instance.vendor_id
         user = VendorRegistration.objects.filter(id=vendor)
 
         if user[0].user_id == request.user.id:
