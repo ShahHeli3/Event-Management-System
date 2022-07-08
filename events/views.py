@@ -18,7 +18,8 @@ class ViewTestimonials(generics.GenericAPIView, mixins.ListModelMixin):
     class for viewing all the testimonials
     """
     serializer_class = ViewTestimonialSerializer
-    queryset = Testimonials.objects.all().order_by('-post_date_time')
+    queryset = Testimonials.objects.select_related('user').all().order_by('post_date_time')
+
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['user']
     search_fields = ['review']
@@ -31,7 +32,6 @@ class TestimonialsViewSet(viewsets.ModelViewSet):
     """
     class for adding, updating and deleting a testimonial
     """
-
     serializer_class = AddTestimonialSerializer
     queryset = Testimonials.objects.all()
     permission_classes = [IsAuthenticated]
@@ -68,7 +68,7 @@ class QuestionAnswersView(generics.GenericAPIView, mixins.ListModelMixin):
     class to view question and answers
     """
     serializer_class = QuestionAnswersSerializer
-    queryset = QuestionAnswerForum.objects.all()
+    queryset = QuestionAnswerForum.objects.select_related('user').all()
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['user']
@@ -143,7 +143,7 @@ class GetEventsView(generics.GenericAPIView, mixins.ListModelMixin):
     for viewing events
     """
     serializer_class = GetEventsSerializer
-    queryset = Events.objects.all().order_by('id')
+    queryset = Events.objects.select_related('event_category').all().order_by('id')
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['event_category']
     search_fields = ['event_name', 'event_details']

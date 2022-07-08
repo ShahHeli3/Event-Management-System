@@ -1,7 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, generics, mixins, status
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import IsAdminUser, IsAuthenticated, BasePermission
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
 from accounts.models import User
@@ -171,6 +171,3 @@ class GetAllVendors(generics.GenericAPIView, mixins.ListModelMixin):
 
     def get(self, request):
         return self.list(request)
-
-
-

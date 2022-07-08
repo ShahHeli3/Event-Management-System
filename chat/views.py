@@ -116,7 +116,7 @@ class ChatRoom(View):
             receiver = room.receiver_user.id
 
         messages = Message.objects.filter(Q(sender_user=sender, receiver_user=receiver) |
-                                         Q(sender_user=receiver, receiver_user=sender)).order_by('timestamp')
+                                          Q(sender_user=receiver, receiver_user=sender)).order_by('timestamp')
 
         return render(request, 'chat/room.html', {
             'room_name': room_name,
