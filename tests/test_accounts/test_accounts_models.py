@@ -12,6 +12,7 @@ class TestModels(APITestCase):
         self.email = 'test@gmail.com'
         self.username = 'test_user'
         self.first_name = 'test'
+
         self.last_name = 'test'
         self.contact_number = '+919876543210'
 
