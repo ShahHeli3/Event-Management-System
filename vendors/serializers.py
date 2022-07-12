@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
+import tasks
 from accounts.models import User
-from utils import Util
 from .models import VendorCategories, VendorRegistration, VendorImages
 
 
@@ -41,7 +41,7 @@ class VendorRegistrationSerializer(serializers.ModelSerializer):
             'body': body,
             'to_email': managers_email
         }
-        Util.send_mail(data)
+        tasks.send_mail.delay(data)
         return attrs
 
 
@@ -70,7 +70,7 @@ class ApproveVendorSerializer(serializers.ModelSerializer):
             'body': body,
             'to_email': [email]
         }
-        Util.send_mail(data)
+        tasks.send_mail.delay(data)
         return attrs
 
 

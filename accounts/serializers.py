@@ -1,9 +1,9 @@
 from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 
+import tasks
 from constants import PASSWORD_DOES_NOT_MATCH, CURRENT_PASSWORD_CHECK, PASSWORD_RESET_LINK, RESET_EMAIL_BODY, \
     RESET_EMAIL_USER_ERROR, TOKEN_ERROR
-from utils import Util
 from .models import User
 from django.core.exceptions import ValidationError
 from django.utils.encoding import smart_str, force_bytes, DjangoUnicodeDecodeError
@@ -104,7 +104,7 @@ class SendPasswordResetEmailSerializer(serializers.Serializer):
                 'body': body,
                 'to_email': [user.email]
             }
-            Util.send_mail(data)
+            tasks.send_mail.delay(data)
 
             return attrs
         else:
