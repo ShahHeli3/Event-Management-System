@@ -47,16 +47,10 @@
 
     const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
-    var chatSocket = new WebSocket(
-        'ws://'
-        + window.location.host
-        + '/ws/chat/'
-        + roomName
-        + '/'
-    );
 
     if(window.location.host === "heli-event-management.herokuapp.com"){
-        var chatSocket = new WebSocket(
+        console.log("heroku server found")
+         var chatSocket = new WebSocket(
         'wss://'
         + window.location.host
         + '/ws/chat/'
@@ -64,6 +58,17 @@
         + '/'
     );
     }
+    if(window.location.host === "127.0.0.1:8000"){
+        console.log("localhost found")
+        var chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/chat/'
+        + roomName
+        + '/'
+    );
+    }
+    console.log(chatSocket)
 
     chatSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
