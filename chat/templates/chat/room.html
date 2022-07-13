@@ -47,7 +47,7 @@
 
     const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
-    const chatSocket = new WebSocket(
+    var chatSocket = new WebSocket(
         'ws://'
         + window.location.host
         + '/ws/chat/'
@@ -56,7 +56,7 @@
     );
 
     if(window.location.host === "heli-event-management.herokuapp.com"){
-        const chatSocket = new WebSocket(
+        var chatSocket = new WebSocket(
         'wss://'
         + window.location.host
         + '/ws/chat/'
