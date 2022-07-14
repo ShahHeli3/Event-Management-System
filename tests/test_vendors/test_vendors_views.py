@@ -366,3 +366,36 @@ class TestViews(APITestCase):
 
         response = self.client.get(reverse('vendors'))
         self.assertEqual(response.status_code, 200)
+
+    def view_filtered_vendors(self, key, value):
+        """
+        function to get response of filtering vendors url
+        """
+        user = User.objects.get(username='heli')
+        self.client.force_authenticate(user=user)
+
+        url = reverse('vendors')
+        return self.client.get(f'{url}?{key}={value}')
+
+    def test_view_vendors_fails_if_invalid_value_datatype(self):
+        """
+        view vendors fails if the value to filter is invalid
+        """
+        response = self.view_filtered_vendors('vendor_category', 'abc')
+        self.assertEqual(response.status_code, 400)
+
+    def test_view_vendors_categories_fails_if_invalid_value_choice(self):
+        """
+        view vendors fails if the value to filter is invalid
+        """
+        response = self.view_filtered_vendors('vendor_category', 100000)
+        self.assertEqual(response.status_code, 400)
+
+    def test_view_filtered_vendors_categories_successful(self):
+        """
+        view vendors successful if the value to filter is valid
+        """
+        vendor_category = VendorCategories.objects.get(id=self.vendor_category_id)
+
+        response = self.view_filtered_vendors('vendor_category', vendor_category.id)
+        self.assertEqual(response.status_code, 200)

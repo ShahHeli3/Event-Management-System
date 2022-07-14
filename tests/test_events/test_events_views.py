@@ -59,6 +59,35 @@ class TestViews(APITestCase):
         response = self.client.get(reverse('view_testimonials'))
         self.assertEqual(response.status_code, 200)
 
+    def view_filtered_testimonials(self, key, value):
+        """
+        function to get response of filtering testimonials url
+        """
+        url = reverse('view_testimonials')
+        return self.client.get(f'{url}?{key}={value}')
+
+    def test_view_testimonial_fails_if_invalid_value_datatype(self):
+        """
+        view testimonials fails if the value to filter is invalid
+        """
+        response = self.view_filtered_testimonials('user', 'abc')
+        self.assertEqual(response.status_code, 400)
+
+    def test_view_testimonial_fails_if_invalid_value_choice(self):
+        """
+        view testimonials fails if the value to filter is invalid
+        """
+        response = self.view_filtered_testimonials('user', 100000)
+        self.assertEqual(response.status_code, 400)
+
+    def test_view_filtered_testimonial_successful(self):
+        """
+        view testimonials successful if the value to filter is valid
+        """
+        user = User.objects.get(id=self.normal_user.id)
+        response = self.view_filtered_testimonials('user', user.id)
+        self.assertEqual(response.status_code, 200)
+
     def test_post_testimonial_fails_if_unauthenticated(self):
         """
         post testimonial fails if user is unauthenticated
@@ -152,6 +181,43 @@ class TestViews(APITestCase):
         self.client.force_authenticate(user=user)
 
         response = self.client.get(reverse('question_answer'))
+        self.assertEqual(response.status_code, 200)
+
+    def view_filtered_qna(self, key, value):
+        """
+        function to get response of filtering question and answers url
+        """
+        url = reverse('question_answer')
+        return self.client.get(f'{url}?{key}={value}')
+
+    def test_view_qna_fails_if_invalid_value_datatype(self):
+        """
+        view question and answers fails if the value to filter is invalid
+        """
+        user = User.objects.get(username='heli')
+        self.client.force_authenticate(user=user)
+
+        response = self.view_filtered_qna('user', 'abc')
+        self.assertEqual(response.status_code, 400)
+
+    def test_view_qna_fails_if_invalid_value_choice(self):
+        """
+        view question and answers fails if the value to filter is invalid
+        """
+        user = User.objects.get(username='heli')
+        self.client.force_authenticate(user=user)
+
+        response = self.view_filtered_qna('user', 100000)
+        self.assertEqual(response.status_code, 400)
+
+    def test_view_filtered_qna_successful(self):
+        """
+        view question and answers successful if the value to filter is valid
+        """
+        user = User.objects.get(id=self.normal_user.id)
+        self.client.force_authenticate(user=user)
+
+        response = self.view_filtered_qna('user', user.id)
         self.assertEqual(response.status_code, 200)
 
     def test_add_question_successful(self):
@@ -298,6 +364,36 @@ class TestViews(APITestCase):
         function to successfully get events
         """
         response = self.client.get(reverse('view_events'))
+        self.assertEqual(response.status_code, 200)
+
+    def view_filtered_events(self, key, value):
+        """
+        function to get response of filtering event url
+        """
+        url = reverse('view_events')
+        return self.client.get(f'{url}?{key}={value}')
+
+    def test_view_event_fails_if_invalid_value_datatype(self):
+        """
+        view event fails if the value to filter is invalid
+        """
+        response = self.view_filtered_events('event_category', 'abc')
+        self.assertEqual(response.status_code, 400)
+
+    def test_view_event_categories_fails_if_invalid_value_choice(self):
+        """
+        view event fails if the value to filter is invalid
+        """
+        response = self.view_filtered_events('event_category', 100000)
+        self.assertEqual(response.status_code, 400)
+
+    def test_view_filtered_event_categories_successful(self):
+        """
+        view event successful if the value to filter is valid
+        """
+        event_category = EventCategories.objects.get(id=self.event_category_id)
+
+        response = self.view_filtered_events('event_category', event_category.id)
         self.assertEqual(response.status_code, 200)
 
     def test_post_event_fails_if_unauthorized(self):

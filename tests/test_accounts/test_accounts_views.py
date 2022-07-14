@@ -1,4 +1,6 @@
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.files import File
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -362,6 +364,34 @@ class TestViews(APITestCase):
         username_response = self.update_profile('username', 'heli_shah')
         self.assertEqual(username_response.status_code, 200)
 
+    def test_update_profile_picture_fails_if_invalid_format(self):
+        """
+        profile picture cannot be updated if image format is other than .jpg, .jpeg or .png
+        """
+        user = User.objects.get(username='test')
+        self.client.force_authenticate(user=user)
+
+        image_data = File(open('requirements.txt', 'rb'))
+        image = SimpleUploadedFile('image.jpg', image_data.read(), content_type='multipart/form-data')
+
+        response = self.client.put(self.profile_url, {'profile_image': image}, format='multipart')
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_profile_picture_successful(self):
+        """
+        profile picture can be updated if image format is valid
+        """
+        user = User.objects.get(username='test')
+        self.client.force_authenticate(user=user)
+
+        image_data = File(open('media/default.jpg', 'rb'))
+        image = SimpleUploadedFile('image.jpg', image_data.read(), content_type='multipart/form-data')
+
+        response = self.client.put(self.profile_url, {'profile_image': image}, format='multipart')
+
+        self.assertEqual(response.status_code, 200)
+
     def test_delete_profile_unsuccessful(self):
         """
         delete profile fails if user is not authenticated
@@ -378,5 +408,3 @@ class TestViews(APITestCase):
 
         response = self.client.delete(self.profile_url)
         self.assertEqual(response.status_code, 204)
-
-
